@@ -58,12 +58,8 @@ export default {
   },
   created(){
     this.subj5.push({id:123,weight:3.0})
-    axios.post("https://reqres.in/invalid-url", this.info)
-    .then(response => this.info = response.data.id)
-    .catch(error => {
-      this.errorMessage = error.message;
-      console.error("There was an error!", error);
-    });
+
+
   }
 }
 </script>
