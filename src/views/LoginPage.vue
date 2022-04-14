@@ -4,9 +4,9 @@ import { useRouter } from 'vue-router'
 import Test from '../components/TestCompo.vue'
 
 export default {
-  components: {
+  /*components: {
     Test
-  },
+  },*/
   setup() {
     const auth = getAuth()
     const router = useRouter()
@@ -41,7 +41,7 @@ export default {
       <router-link to="/register">Sign up here</router-link>
     </p>
   </div>
-  <div><Test></Test></div>
+  <!--div><Test></Test></div-->
 </template>
 
 <style>

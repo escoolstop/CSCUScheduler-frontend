@@ -2,17 +2,30 @@
 import { getAuth, signOut } from 'firebase/auth'
 import { useAuthState } from '../firebase'
 import { useRouter } from 'vue-router'
-
+import ScheduleSubjectCompo from '../components/ScheduleSubjectCompo.vue'
 export default {
   name: 'SchedulePage',
   data(){
     return{
-      testdata:[[2301696,2301369],[3301696,3301369],[2116516],[],[],[],[],[],[],[],[11],[],[],[],[],[],[],[],[],[],[],[22],
-               [23],[],[],[],[],[],[],[],[],[],[33],[],[],[],[],[],[],[],[],[],[],[44],
-               [],[],[],[],[],[],[],[],[],[],[55],[],[],[],[],[],[],[],[],[],[],[66],
-               [],[],[],[],[],[],[],[],[],[],[77],[],[],[],[],[],[],[],[],[],[],[88],
-               [],[],[],[],[],[],[],[],[],[],[99],[],[],[],[],[],[],[],[],[],[],[110]]
+      scheduleArray:[[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],
+                    [],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],
+                    [],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],
+                    [],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],
+                    [],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]],
+      /*scheduleArray:[[],[],[],[],[],[],[],[],[],[],[11],[],[],[],[],[],[],[],[],[],[],[22],
+                    [],[],[],[],[],[],[],[],[],[],[33],[],[],[],[],[],[],[],[],[],[],[44],
+                    [],[],[],[],[],[],[],[],[],[],[55],[],[],[],[],[],[],[],[],[],[],[66],
+                    [],[],[],[],[],[],[],[],[],[],[77],[],[],[],[],[],[],[],[],[],[],[88],
+                    [],[],[],[],[],[],[],[],[],[],[99],[],[],[],[],[],[],[],[],[],[],[110]],*/                 
+      activeSubj:[],
+      inactiveSubj:[],
+      all_subj:[{su_id:'2301111', su_name: 'CALCULUS I', su_credit:3, su_level:'4',su_genre:'CS1',su_time:[[51,52,93,94,95,96],[11,12,13,14,51,52,91,92,93,94,95,96]],su_sec:[1,2]},
+      {su_id:'1234567', su_name: 'FREEDOM OF ASSEMBLY AND LAW', su_credit:3, su_level:'4',su_genre:'CS1',su_time:[[55,56,57,58,59,60],[99,100]],su_sec:[1,2]},
+      {su_id:'9876543', su_name: 'NOT CALC2', su_credit:3, su_level:'4',su_genre:'CS1',su_time:[[55,56,57,58,59,60],[99,100]],su_sec:[1,2]}]
     }
+  },
+  components: {
+    ScheduleSubjectCompo
   },
   setup() {
     const { user } = useAuthState()
@@ -29,6 +42,29 @@ export default {
     }
 
     return { user, signOutUser }
+  },
+  methods: {
+    addSubject(subject_id,subjectTimeArray) {
+      for (var i = 0; i < subjectTimeArray.length; i++) {
+        this.scheduleArray[subjectTimeArray[i]-1].push(subject_id);
+      }
+    },
+    removeSubject(subject_id,subjectTimeArray) {
+      for (var i = 0; i < subjectTimeArray.length; i++) {
+        this.scheduleArray[subjectTimeArray[i]-1] = this.scheduleArray[subjectTimeArray[i]-1].filter(x => x != subject_id);
+      }
+    },
+    addAllSubject(){
+      for (var i = 0; i < this.all_subj.length; i++) {
+      this.addSubject(this.all_subj[i].su_id,this.all_subj[i].su_time[0]);
+    }
+    },
+    trashSubject(subject_id){
+      this.all_subj = this.all_subj.filter( subject => subject.su_id != subject_id)
+    }
+  },
+  mounted() {
+    this.addAllSubject();
   }
 }
 </script>
@@ -42,65 +78,47 @@ export default {
     <div class="navboxstatic" style="margin-left: auto;">{{ user?.email }}</div>
     <div class="navbox" @click="signOutUser">Sign Out</div>
   </div>
-    <h1>Welcome {{ user?.email }}!</h1>
-    <button @click="signOutUser">Sign Out</button>
-    <div class="Rtable">
-        <!--div class="overlay">2301369<br>DATA COMM I</div>
-        <div class="overlay a">I'M HERE</div>
-        <div class="overlay b">I'M HERE</div>
-        <div class="overlay c">I'M HERE</div>
-        <div class="overlay d">I'M HERE</div-->
-        <div class="Rtable-cell head edge">Day/Time</div>
-        <div class="Rtable-cell head columnH">8:00-9:00</div>
-        <div class="Rtable-cell head columnH">9:00-10:00</div>
-        <div class="Rtable-cell head columnH">10:00-11:00</div>
-        <div class="Rtable-cell head columnH">11:00-12:00</div>
-        <div class="Rtable-cell head columnH">12:00-13:00</div>
-        <div class="Rtable-cell head columnH">13:00-14:00</div>
-        <div class="Rtable-cell head columnH">14:00-15:00</div>
-        <div class="Rtable-cell head columnH">15:00-16:00</div>
-        <div class="Rtable-cell head columnH">16:00-17:00</div>
-        <div class="Rtable-cell head columnH">17:00-18:00</div>
-        <div class="Rtable-cell head columnH">18:00-19:00</div>
+  <!--h1>Welcome {{ user?.email }}!</h1>
+  <button @click="signOutUser">Sign Out</button-->
+  <div class="Rtable">
+    <!--div class="overlay">2301369<br>DATA COMM I</div>
+    <div class="overlay a">I'M HERE</div>
+    <div class="overlay b">I'M HERE</div>
+    <div class="overlay c">I'M HERE</div>
+    <div class="overlay d">I'M HERE</div-->
+    <div class="Rtable-cell head edge">Day/Time</div>
+    <div class="Rtable-cell head columnH">8:00-9:00</div>
+    <div class="Rtable-cell head columnH">9:00-10:00</div>
+    <div class="Rtable-cell head columnH">10:00-11:00</div>
+    <div class="Rtable-cell head columnH">11:00-12:00</div>
+    <div class="Rtable-cell head columnH">12:00-13:00</div>
+    <div class="Rtable-cell head columnH">13:00-14:00</div>
+    <div class="Rtable-cell head columnH">14:00-15:00</div>
+    <div class="Rtable-cell head columnH">15:00-16:00</div>
+    <div class="Rtable-cell head columnH">16:00-17:00</div>
+    <div class="Rtable-cell head columnH">17:00-18:00</div>
+    <div class="Rtable-cell head columnH">18:00-19:00</div>
         
-        <div class="Rtable-cell head rowH">MON</div>
-        <div class="Rtable-cell inner" v-for="subArray in testdata.slice(0, 22)" :key="subArray" :class="{redTimeSlot: subArray.length>1}"><div v-for="subId in subArray" :key="subId">{{subId}}</div></div>
-        <!--div class="Rtable-cell inner"><div v-for="subArray in testdata[0]" :key="subArray">{{subArray}}</div></div-->
+    <div class="Rtable-cell head rowH">MON</div>
+    <div class="Rtable-cell inner" v-for="subArray in scheduleArray.slice(0, 22)" :key="subArray" :class="{redTimeSlot: subArray.length>1}"><div v-for="subId in subArray" :key="subId">{{subId}}</div></div>
+    <!--div class="Rtable-cell inner"><div v-for="subArray in scheduleArray[0]" :key="subArray">{{subArray}}</div></div-->
 
-        <div class="Rtable-cell head rowH">TUE</div>
-        <div class="Rtable-cell inner" v-for="subArray in testdata.slice(22, 44)" :key="subArray"><div v-for="subId in subArray" :key="subId">{{subId}}</div></div>
+    <div class="Rtable-cell head rowH">TUE</div>
+    <div class="Rtable-cell inner" v-for="subArray in scheduleArray.slice(22, 44)" :key="subArray" :class="{redTimeSlot: subArray.length>1}"><div v-for="subId in subArray" :key="subId">{{subId}}</div></div>
+    
+    <div class="Rtable-cell head rowH">WED</div>
+    <div class="Rtable-cell inner" v-for="subArray in scheduleArray.slice(44, 66)" :key="subArray" :class="{redTimeSlot: subArray.length>1}"><div v-for="subId in subArray" :key="subId">{{subId}}</div></div>
+
+    <div class="Rtable-cell head rowH">THU</div>
+    <div class="Rtable-cell inner" v-for="subArray in scheduleArray.slice(66, 88)" :key="subArray" :class="{redTimeSlot: subArray.length>1}"><div v-for="subId in subArray" :key="subId">{{subId}}</div></div>
+
+    <div class="Rtable-cell head rowH">FRI</div>
+    <div class="Rtable-cell inner" v-for="subArray in scheduleArray.slice(88, 110)" :key="subArray" :class="{redTimeSlot: subArray.length>1}"><div v-for="subId in subArray" :key="subId">{{subId}}</div></div>
       
-        <div class="Rtable-cell head rowH">WED</div>
-        <div class="Rtable-cell inner" v-for="subArray in testdata.slice(44, 66)" :key="subArray"><div v-for="subId in subArray" :key="subId">{{subId}}</div></div>
-
-        <div class="Rtable-cell head rowH">THU</div>
-        <div class="Rtable-cell inner" v-for="subArray in testdata.slice(66, 88)" :key="subArray"><div v-for="subId in subArray" :key="subId">{{subId}}</div></div>
-
-        <div class="Rtable-cell head rowH">FRI</div>
-        <div class="Rtable-cell inner">2301112<br>CALCULUS</div>
-        <div class="Rtable-cell inner">2301112<br>CALCULUS</div>
-        <div class="Rtable-cell inner" style="background-color: lightcyan;">2000501<br>CON PDG PEACE CONF</div>
-        <div class="Rtable-cell inner" style="background-color: lightcyan;">2000501<br>CON PDG PEACE CONF</div>
-        <div class="Rtable-cell inner" style="background-color: red;">2000501<br>CON PDG PEACE CONF<br>2301112<br>CALCULUS</div>
-        <div class="Rtable-cell inner"></div>
-        <div class="Rtable-cell inner"></div>
-        <div class="Rtable-cell inner"></div>
-        <div class="Rtable-cell inner"></div>
-        <div class="Rtable-cell inner"></div>
-        <div class="Rtable-cell inner">99</div>
-        <div class="Rtable-cell inner"></div>
-        <div class="Rtable-cell inner"></div>
-        <div class="Rtable-cell inner"></div>
-        <div class="Rtable-cell inner"></div>
-        <div class="Rtable-cell inner"></div>
-        <div class="Rtable-cell inner"></div>
-        <div class="Rtable-cell inner"></div>
-        <div class="Rtable-cell inner"></div>
-        <div class="Rtable-cell inner"></div>
-        <div class="Rtable-cell inner"></div>
-        <div class="Rtable-cell inner">110</div>
-      
-      </div>
+  </div>
+  <div class="lowerhalf">
+  <div class="subjforSchedule"><ScheduleSubjectCompo v-for="item in this.all_subj" v-bind="item" :key="item.su_id"></ScheduleSubjectCompo></div>
+  </div>
 </template>
 <style scope>
 button,
@@ -117,7 +135,6 @@ html {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 16px;
 }
-
 .Rtable {
   margin: 0 1%;
   position: relative;
@@ -128,12 +145,13 @@ html {
   width: 98%;
   /*min-width: 1440px;*/
   font-size: max(0.833vw, 12px);/*16px with min 12px*/
+  margin-top: 50px;
 }
 .Rtable-cell {
   box-sizing: border-box;
   width: 4.3%;
   /*padding: 0.8em 1.2em;*/
-  padding: 12.5px 3px;
+  padding: 0.651vw 0.156vw;/*12.5px 3px;*/
   overflow: hidden;
   list-style: none;
   border: solid 1px black;
@@ -143,20 +161,26 @@ html {
   text-overflow: ellipsis;
   text-align: center;
   align-items: center;
-  height: 100px;
+  height: 5.208vw;
+  /*height: 5.208vw;/*100px;*/
+  
+  
 }
 .head {
   background-color: lightcyan;
 }
 .rowH {
   width: 5.4%;
-  padding: 37.5px 0;
+  /*padding: 1.953vw 0/*37.5px 0*/;
   border-left-style: solid;
   border-top-style: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .columnH {
-  height: 50px;
-  padding: 15px 0;
+  height: 2.604vw;/*50px;*/
+  padding: 0.781vw 0;/*15px 0;*/
   width: 8.6%;
   border-top-style: solid;
   border-left-style: none;
@@ -164,14 +188,31 @@ html {
 .edge {
   border-left-style: solid;
   border-top-style: solid;
-  height: 50px;
+  height: 2.604vw;/*50px;*/
   width: 5.4%;
-  padding: 15px 0;
+  padding: 0.781vw 0;/*15px 0;*/
 }
 .inner {
   border-left-style: none;
   border-top-style: none;
+  background-color: white;
 }
+.redTimeSlot{
+  background-color: #ffcc00;
+}
+.lowerhalf{
+  margin: 1.5vw 2%;
+  width: 96%;
+  display: flex;
+  justify-content: left;
+  align-items: top;
+  border: solid black 1px;
+  height: 17.5vw;
+}
+.subjforSchedule{
+  overflow:auto;
+}
+
 
 .overlay {
   position: absolute;
@@ -210,8 +251,5 @@ html {
   width: calc(6 * 4.3% + 1px);
   top: calc(49px + 4 * 100px);
   left: calc(5.4% - 1px + 4.3% * 3);
-}
-.redTimeSlot{
-  background-color: red;
 }
 </style>

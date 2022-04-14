@@ -4,34 +4,31 @@ import { useAuthState } from '../firebase'
 import { useRouter } from 'vue-router'
 import { axios } from 'axios'
 
-//var test2= [{id:2301111, number: 'CALCULUS I', weight:3.0}, {id:2301112, number: 'CALCULUS II', weight:3.0}];
-
 export default {
   name: 'HistoryPage',
   data(){
     return{
-      displaymode:2,
-      subj1_1:[{id:2301111, number: 'CALCULUS I', weight:3.0}],
-      subj1_2:[{id:2301111, number: 'CALCULUS I', weight:3.0}],
-      subj2_1:[{id:2301111, number: 'CALCULUS I', weight:3.0}, {id:2301112, number: 'CALCULUS II', weight:3.0}
-      
-      ,{id:2301111, number: 'CALCULUS I', weight:3.0}, {id:2301112, number: 'CALCULUS II', weight:3.0},{id:2301112, number: 'CALCULUS II', weight:3.0}
-      ,{id:2301111, number: 'CALCULUS I', weight:3.0}, {id:2301112, number: 'CALCULUS II', weight:3.0},{id:2301112, number: 'CALCULUS II', weight:3.0}
-      ,{id:2301111, number: 'CALCULUS I', weight:3.0}, {id:2301112, number: 'CALCULUS II', weight:3.0},{id:2301112, number: 'CALCULUS II', weight:3.0}
-      ,{id:2301111, number: 'CALCULUS I', weight:3.0}, {id:2301112, number: 'CALCULUS II', weight:3.0}
-      ,{id:2301111, number: 'CALCULUS I', weight:3.0}, {id:2301112, number: 'CALCULUS II', weight:3.0},{id:2301112, number: 'CALCULUS II', weight:3.0} 
-      ],
-      subj2_2:[{id:2301111, number: 'SOME KIND OF SOFTWARE DEVELOPMENT', weight:3.0}, {id:2301112, number: 'SYS ANAL IDK', weight:3.0}],
-      subj3:[],
-      subj4_1:[
-        {id:2301111, number: 'CALCULUS I', weight:3.0},{id:2301111, number: 'CALCULUS I', weight:3.0},{id:2301111, number: 'CALCULUS I', weight:3.0},{id:2301111, number: 'CALCULUS I', weight:3.0},{id:2301111, number: 'CALCULUS I', weight:3.0},
-        {id:2301111, number: 'CALCULUS I', weight:3.0},{id:2301111, number: 'CALCULUS I', weight:3.0},{id:2301111, number: 'CALCULUS I', weight:3.0},{id:2301111, number: 'CALCULUS I', weight:3.0},{id:2301111, number: 'CALCULUS I', weight:3.0},
-      ],
+      displaymode:1,
+      subjAll:[{su_id:'2301111', su_name: 'CALCULUS I', su_credit:3, su_level:'4',su_genre:'CS1'},{su_id:2301151, su_name: 'CALCULUS I', su_credit:3, su_level:'4',su_genre:'CS1'}
+      ,{su_id:'2301222', su_name: 'CALCULUS I', su_credit:3, su_genre:'CS-CORE'}, {su_id:'2312100', su_name: 'MICROB', su_credit:3, su_genre:'GEN-SC'}
+      ,{su_id:'3404117', su_name: 'INTRO TO LAW', su_credit:3, su_genre:'GEN-SO'}
+      ,{su_id:'2301361', su_name: 'SYSTEMS ANALYSIS AND DESIGN', su_credit:3, su_genre:'CS1'},{su_id:'2301361', su_name: 'SYSTEMS ANALYSIS AND DESIGN', su_credit:3, su_genre:'CS1'}
+      ,{su_id:'2312100', su_name: 'MICROB', su_credit:3, su_genre:'GEN-SC'}],
+      subj1_1:[{su_id:'2301115', su_name: 'CALCULUS I', su_credit:3, su_genre:'CS1'}],
+      subj1_2:[{su_id:'2301111', su_name: 'CALCULUS I', su_credit:3, su_genre:'CS2'}],
+      subj2_1:[{su_id:'2301111', su_name: 'CALCULUS I', su_credit:3, su_genre:'CS-CORE'}],
+      subj2_2:[{su_id:'2301361', su_name: 'SYSTEMS ANALYSIS AND DESIGN', su_credit:3, su_genre:'CS1'}],
+      subj3:[{su_id:'2304184', su_name: 'GENERAL PHYSICS LABORATORY II', su_credit:3, su_genre:'SC-CORE'}],
+      subj4_1:[{su_id:'3404117', su_name: 'INTRO TO LAW', su_credit:3, su_genre:'GEN-SO'}],
+      subj4_2:[{su_id:'2296352', su_name: '21ST CENTURY BUDDHISTS', su_credit:3, su_genre:'GEN-HU'}],
+      subj4_3:[{su_id:'3309102', su_name: 'OUR BODY', su_credit:3, su_genre:'GEN-SC'}], 
+      subj4_4:[{su_id:'0201122', su_name: 'MANAGEMENT OF PUBLIC DISASTER', su_credit:3, su_genre:'GEN-IN'}],/*
+      subj4_1:[],
       subj4_2:[],
-      subj4_3:[],
-      subj4_4:[],
-      subj4_5:[],
-      subj4_6:[],
+      subj4_3:[], 
+      subj4_4:[],*/
+      subj4_5:[{su_id:'5500112', su_name: 'EXPERIENTIAL ENGLISH II', su_credit:3, su_genre:'GEN-LANG'}],
+      subj4_6:[{su_id:'2312100', su_name: 'MICROB', su_credit:3, su_genre:'GEN-SC'}],
       subj5:[],
       info:"test"
     }
@@ -53,13 +50,79 @@ export default {
   },
   methods: {
     totalRequest(subarr) {      
-      return subarr.reduce((acc, item) => acc + item.weight, 0);
-    }
+      return subarr.reduce((acc, item) => acc + item.su_credit, 0);
+    },
+    sortSubjByGenre(inputArray, targetArray, genre, maxWeight){
+      let currWeight = this.totalRequest(targetArray);
+      for (var i = 0, length = inputArray.length; i < length; i++) {
+        if (currWeight >= maxWeight){ return; }
+        if (inputArray[i].su_genre == genre){
+            currWeight += inputArray[i].su_credit;
+            targetArray.push(...inputArray.splice(i, 1));            
+            if (currWeight >= maxWeight){ return; }
+            i--;
+            length--;
+        }
+    } return;
+    },
+    sortSubjById(inputArray, targetArray, subjIdList, maxWeight) {
+      let currWeight = this.totalRequest(targetArray); //maybe turn it to set and use .has instead of .includes to compare? faster or not idk https://dev.to/arnaud/using-array-prototype-includes-vs-set-prototype-has-to-filter-arrays-41fg
+      for (var i = 0, length = inputArray.length; i < length; i++) {
+        if (subjIdList.includes(inputArray[i].su_id)) {
+          currWeight += inputArray[i].su_credit;
+          targetArray.push(...inputArray.splice(i, 1));
+          if (currWeight >= maxWeight){ return; }
+          i--;
+          length--;
+        }
+      }
+      return;
+    },
+    sortSubjByGenre_Regexpy(inputArray, targetArray, genre, maxWeight, stringForRegexpy){
+      let currWeight = this.totalRequest(targetArray);
+      for (var i = 0, length = inputArray.length; i < length; i++) {
+        let regexpy = new RegExp(stringForRegexpy);
+        if (currWeight >= maxWeight){ return; }
+        if (inputArray[i].su_genre == genre && regexpy.test(inputArray[i].su_id)){
+            currWeight += inputArray[i].su_credit;
+            targetArray.push(...inputArray.splice(i, 1));            
+            if (currWeight >= maxWeight){ return; }
+            i--;
+            length--;
+        }
+    } return;
+    },
+    sortSubjByGenre_ReverseRegexpy(inputArray, targetArray, genre, maxWeight, stringForRegexpy){
+      let currWeight = this.totalRequest(targetArray);
+      for (var i = 0, length = inputArray.length; i < length; i++) {
+        let regexpy = new RegExp(stringForRegexpy);
+        if (currWeight >= maxWeight){ return; }
+        if (inputArray[i].su_genre == genre && !regexpy.test(inputArray[i].su_id)){
+            currWeight += inputArray[i].su_credit;
+            targetArray.push(...inputArray.splice(i, 1));            
+            if (currWeight >= maxWeight){ return; }
+            i--;
+            length--;
+        }
+    } return;
+    },
   },
   created(){
-    this.subj5.push({id:123,weight:3.0})
-
-
+    //this.subj5.push({su_id:123,su_credit:3})
+    this.sortSubjByGenre(this.subjAll, this.subj2_1, 'CS-CORE', 43)
+    this.sortSubjByGenre(this.subjAll, this.subj3, 'SC-CORE', 31)
+    this.sortSubjById(this.subjAll, this.subj2_2, ['2301361','2301367','2301369'], 6)
+    this.sortSubjById(this.subjAll, this.subj4_5, ['5500111','5500112','5500204','5500496'], 12)
+    this.sortSubjById(this.subjAll, this.subj4_6, ['2301170'], 3) /*only take comp prog real max is 6*/
+    this.sortSubjByGenre(this.subjAll, this.subj1_1, 'CS1', 15)
+    this.sortSubjByGenre(this.subjAll, this.subj1_2, 'CS2', 6)
+    this.sortSubjByGenre(this.subjAll, this.subj1_2, 'CS1', 6)
+    this.sortSubjByGenre_ReverseRegexpy(this.subjAll, this.subj4_1, 'GEN-SO', 3, '^23')
+    this.sortSubjByGenre_ReverseRegexpy(this.subjAll, this.subj4_2, 'GEN-HU', 3, '^23')
+    this.sortSubjByGenre_ReverseRegexpy(this.subjAll, this.subj4_3, 'GEN-SC', 3, '^23')
+    this.sortSubjByGenre_ReverseRegexpy(this.subjAll, this.subj4_4, 'GEN-LANG', 3, '^23')
+    this.sortSubjByGenre_Regexpy(this.subjAll, this.subj4_6, 'GEN-SC', 6, '^23')
+    this.subj5 = [...this.subjAll]
   }
 }
 </script>
@@ -77,7 +140,7 @@ export default {
     <div class="wrappermain">
       <div class="selectorBox">
         <div class="circle">
-          <div class="big">125</div>
+          <div class="big">{{ totalRequest(subj1_1)+totalRequest(subj1_2)+totalRequest(subj2_1)+totalRequest(subj2_2)+totalRequest(subj3)+totalRequest(subj4_1)+totalRequest(subj4_2)+totalRequest(subj4_3)+totalRequest(subj4_4)+totalRequest(subj4_5)+totalRequest(subj4_6)+totalRequest(subj5) }}</div>
           <div class="break"></div>          
           <div class="small">total credit</div>
         </div>
@@ -88,94 +151,92 @@ export default {
         <div class="label" @click="displaymode=4;"><div class="category">GENED</div><div class="small">{{ totalRequest(subj4_1)+totalRequest(subj4_2)+totalRequest(subj4_3)+totalRequest(subj4_4)+totalRequest(subj4_5)+totalRequest(subj4_6) }}/30</div></div>       
         <div class="label" @click="displaymode=5;"><div class="category">FREE</div><div class="small">{{ totalRequest(subj5) }}/6</div></div>     
       </div>
-
       <!--display- 1 CS / 2 CS Core / 3 SC Core / 4 GENED / FREE -->
       <div v-if="displaymode==1" class="subjectDisplayBox">
 
         <div class="subjectHead">CS I {{ totalRequest(subj1_1) }}/15</div>
-        <div v-for="item in subj1_1" :key="item.id" class=subjectList>CS I: {{ item.id }} | {{ item.number }} | {{ item.weight }}</div>
+        <div v-for="item in subj1_1" :key="item.su_id" class=subjectList>{{ item.su_genre }}: {{ item.su_id }} | {{ item.su_name }} | {{ item.su_credit }}</div>
 
         <div class="subjectHead">CS I / CS II {{ totalRequest(subj1_2) }}/6</div>
-        <div v-for="item in subj1_2" :key="item.id" class=subjectList>CS I / CS II: {{ item.id }} | {{ item.number }} | {{ item.weight }}</div>
+        <div v-for="item in subj1_2" :key="item.su_id" class=subjectList>{{ item.su_genre }}: {{ item.su_id }} | {{ item.su_name }} | {{ item.su_credit }}</div>
 
       </div>
       <div v-if="displaymode==2" class="subjectDisplayBox">
-        {{info}}
 
         <div class="subjectHead">CS CORE {{ totalRequest(subj2_1) }}/43</div>
-        <div v-for="item in subj2_1" :key="item.id" class=subjectList>CS CORE: {{ item.id }} | {{ item.number }} | {{ item.weight }}</div>
+        <div v-for="item in subj2_1" :key="item.su_id" class=subjectList>{{ item.su_genre }}: {{ item.su_id }} | {{ item.su_name }} | {{ item.su_credit }}</div>
 
         <div class="subjectHead">CS CHOSEN {{ totalRequest(subj2_2) }}/6</div>
-        <div v-for="item in subj2_2" :key="item.id" class=subjectList>CS CHOSEN: {{ item.id }} | {{ item.number }} | {{ item.weight }}</div>
+        <div v-for="item in subj2_2" :key="item.su_id" class=subjectList>{{ item.su_genre }}: {{ item.su_id }} | {{ item.su_name }} | {{ item.su_credit }}</div>
 
       </div>
       <div v-if="displaymode==3" class="subjectDisplayBox">
 
         <div class="subjectHead">SC Core {{ totalRequest(subj3) }}/31</div>
-        <div v-for="item in subj3" :key="item.id" class=subjectList>SC CORE: {{ item.id }} | {{ item.number }} | {{ item.weight }}</div>
+        <div v-for="item in subj3" :key="item.su_id" class=subjectList>{{ item.su_genre }}: {{ item.su_id }} | {{ item.su_name }} | {{ item.su_credit }}</div>
 
       </div>
       
       <div v-if="displaymode==4" class="subjectDisplayBox">
 
       <div class="subjectHead">กลุ่มวิชาสังคมศาสตร์ {{ totalRequest(subj4_1) }}/3</div>
-      <div v-for="item in subj4_1" :key="item.id" class=subjectList>กลุ่มวิชาสังคมศาสตร์: {{ item.id }} | {{ item.number }} | {{ item.weight }}</div>
+      <div v-for="item in subj4_1" :key="item.su_id" class=subjectList>{{ item.su_genre }}: {{ item.su_id }} | {{ item.su_name }} | {{ item.su_credit }}</div>
 
       <div class="subjectHead">กลุ่มวิชามนุษยศาสตร์ {{ totalRequest(subj4_2) }}/3</div>
-      <div v-for="item in subj4_2" :key="item.id" class=subjectList>กลุ่มวิชามนุษยศาสตร์: {{ item.id }} | {{ item.number }} | {{ item.weight }}</div>
+      <div v-for="item in subj4_2" :key="item.su_id" class=subjectList>{{ item.su_genre }}: {{ item.su_id }} | {{ item.su_name }} | {{ item.su_credit }}</div>
 
-      <div class="subjectHead">กลุ่มวิชามนุษยศาสตร์ {{ totalRequest(subj4_3) }}/3</div>
-      <div v-for="item in subj4_3" :key="item.id" class=subjectList>กลุ่มวิชามนุษยศาสตร์: {{ item.id }} | {{ item.number }} | {{ item.weight }}</div>
+      <div class="subjectHead">วิทยาศาสตร์และคณิตศาสตร {{ totalRequest(subj4_3) }}/3</div>
+      <div v-for="item in subj4_3" :key="item.su_id" class=subjectList>{{ item.su_genre }}: {{ item.su_id }} | {{ item.su_name }} | {{ item.su_credit }}</div>
 
       <div class="subjectHead">กลุ่มวิชาสหศาสตร์ {{ totalRequest(subj4_4) }}/3</div>
-      <div v-for="item in subj4_4" :key="item.id" class=subjectList>กลุ่มวิชาสหศาสตร์: {{ item.id }} | {{ item.number }} | {{ item.weight }}</div>
+      <div v-for="item in subj4_4" :key="item.su_id" class=subjectList>{{ item.su_genre }}: {{ item.su_id }} | {{ item.su_name }} | {{ item.su_credit }}</div>
 
       <div class="subjectHead">กลุ่มวิชาภาษา {{ totalRequest(subj4_5) }}/12</div>
-      <div v-for="item in subj4_5" :key="item.id" class=subjectList>กลุ่มวิชาภาษา: {{ item.id }} | {{ item.number }} | {{ item.weight }}</div>
+      <div v-for="item in subj4_5" :key="item.su_id" class=subjectList>{{ item.su_genre }}: {{ item.su_id }} | {{ item.su_name }} | {{ item.su_credit }}</div>
 
       <div class="subjectHead">กลุ่มวิชาศึกษาทั่วไปกลุ่มพิเศษ {{ totalRequest(subj4_6) }}/6</div>
-      <div v-for="item in subj4_6" :key="item.id" class=subjectList>กลุ่มวิชาศึกษาทั่วไปกลุ่มพิเศษ: {{ item.id }} | {{ item.number }} | {{ item.weight }}</div>
+      <div v-for="item in subj4_6" :key="item.su_id" class=subjectList>{{ item.su_genre }}: {{ item.su_id }} | {{ item.su_name }} | {{ item.su_credit }}</div>
         
           
       </div>
       <div v-if="displaymode==5" class="subjectDisplayBox">
         <div class="subjectHead">FREE {{ totalRequest(subj5) }}/6</div>
-        <div v-for="item in subj5" :key="item.id" class=subjectList>FREE: {{ item.id }} | {{ item.number }} | {{ item.weight }}</div>
+        <div v-for="item in subj5" :key="item.su_id" class=subjectList>{{ item.su_genre }}: {{ item.su_id }} | {{ item.su_name }} | {{ item.su_credit }}</div>
       </div>
 
       <div class="summaryBox">
-        <div v-if="displaymode==1">1
-          <div v-if="totalRequest(subj1_1)+totalRequest(subj1_2)==15">ALL CLEAR</div>
-          <div v-else>
-            <div v-if="totalRequest(subj1_1)!=15">CS I - {{15 - totalRequest(subj1_1)}} CR</div>
-            <div v-if="totalRequest(subj1_2)!=6">CS II - {{6 - totalRequest(subj1_2)}} CR</div>
+        <div v-if="displaymode==1">
+          <div v-if="totalRequest(subj1_1)>=15&&totalRequest(subj1_2)>=6" class="summGreen">ALL CLEAR</div>
+          <div v-else class="summRed">
+            <div v-if="totalRequest(subj1_1)<15">CS I - {{15 - totalRequest(subj1_1)}} CR</div>
+            <div v-if="totalRequest(subj1_2)<6">CS II - {{6 - totalRequest(subj1_2)}} CR</div>
           </div>
         </div>
-        <div v-if="displaymode==2">2
-          <div v-if="totalRequest(subj2_1)+totalRequest(subj2_2)==49">ALL CLEAR</div>
-          <div v-else>
-            <div v-if="totalRequest(subj2_1)!=43">CS CORE - {{43 - totalRequest(subj2_1)}} CR</div>
-            <div v-if="totalRequest(subj2_2)!=6">CS CHOSEN - {{6 - totalRequest(subj2_2)}} CR</div>
+        <div v-if="displaymode==2">
+          <div v-if="totalRequest(subj2_1)>=43&&totalRequest(subj2_2)>=6" class="summGreen">ALL CLEAR</div>
+          <div v-else class="summRed">
+            <div v-if="totalRequest(subj2_1)<43">CS CORE - {{43 - totalRequest(subj2_1)}} CR</div>
+            <div v-if="totalRequest(subj2_2)<6">CS CHOSEN - {{6 - totalRequest(subj2_2)}} CR</div>
           </div>
         </div>
-        <div v-if="displaymode==3">3
-          <div v-if="totalRequest(subj3)==31">ALL CLEAR</div>
-          <div v-else>SC CORE - {{31 - totalRequest(subj3)}} CR</div>
+        <div v-if="displaymode==3">
+          <div v-if="totalRequest(subj3)>=31" class="summGreen">ALL CLEAR</div>
+          <div v-else class="summRed">SC CORE - {{31 - totalRequest(subj3)}} CR</div>
         </div>
-        <div v-if="displaymode==4">4
-          <div v-if="totalRequest(subj4_1)+totalRequest(subj4_2)+totalRequest(subj4_3)+totalRequest(subj4_4)+totalRequest(subj4_5)+totalRequest(subj4_6)==30">ALL CLEAR</div>
-          <div v-else>
-            <div v-if="totalRequest(subj4_1)!=3">กลุ่มวิชาสังคมศาสตร์ - {{3 - totalRequest(subj4_1)}} CR</div>
-            <div v-if="totalRequest(subj4_2)!=3">กลุ่มวิชามนุษยศาสตร์ - {{3 - totalRequest(subj4_2)}} CR</div>
-            <div v-if="totalRequest(subj4_3)!=3">กลุ่มวิชามนุษยศาสตร์ - {{3 - totalRequest(subj4_3)}} CR</div>
-            <div v-if="totalRequest(subj4_4)!=3">กลุ่มวิชาสหศาสตร์ - {{3 - totalRequest(subj4_4)}} CR</div>
-            <div v-if="totalRequest(subj4_5)!=12">กลุ่มวิชาภาษา - {{12 - totalRequest(subj4_5)}} CR</div>
-            <div v-if="totalRequest(subj4_6)!=6">กลุ่มวิชาศึกษาทั่วไปกลุ่มพิเศษ - {{6 - totalRequest(subj4_6)}} CR</div>
+        <div v-if="displaymode==4">
+          <div v-if="totalRequest(subj4_1)>=3&&totalRequest(subj4_2)>=3&&totalRequest(subj4_3)>=3&&totalRequest(subj4_4)>=3&&totalRequest(subj4_5)>=12&&totalRequest(subj4_6)>=6" class="summGreen">ALL CLEAR</div>
+          <div v-else class="summRed">
+            <div v-if="totalRequest(subj4_1)<3">กลุ่มวิชาสังคมศาสตร์ - {{3 - totalRequest(subj4_1)}} CR</div>
+            <div v-if="totalRequest(subj4_2)<3">กลุ่มวิชามนุษยศาสตร์ - {{3 - totalRequest(subj4_2)}} CR</div>
+            <div v-if="totalRequest(subj4_3)<3">กลุ่มวิชามนุษยศาสตร์ - {{3 - totalRequest(subj4_3)}} CR</div>
+            <div v-if="totalRequest(subj4_4)<3">กลุ่มวิชาสหศาสตร์ - {{3 - totalRequest(subj4_4)}} CR</div>
+            <div v-if="totalRequest(subj4_5)<12">กลุ่มวิชาภาษา - {{12 - totalRequest(subj4_5)}} CR</div>
+            <div v-if="totalRequest(subj4_6)<6">กลุ่มวิชาศึกษาทั่วไปกลุ่มพิเศษ - {{6 - totalRequest(subj4_6)}} CR</div>
           </div>
         </div>
-        <div v-if="displaymode==5">5
-          <div v-if="totalRequest(subj5)==6">ALL CLEAR</div>
-          <div v-else>FREE - {{6 - totalRequest(subj5)}} CR</div>
+        <div v-if="displaymode==5">
+          <div v-if="totalRequest(subj5)>=6" class="summGreen"><img src="../assets/checkmark.png" class="checkImg"/><div>ALL CLEAR</div></div>
+          <div v-else class="summRed">FREE - {{6 - totalRequest(subj5)}} CR</div>
         </div>
       </div>
 
@@ -184,6 +245,7 @@ export default {
 </template>
 
 <style scoped>
+
 /*dev viewport width = 1920*/
 .empty{
   width:100%;
@@ -195,7 +257,7 @@ export default {
 }
 .small {
   width: 100%;
-  font-size: 0.885vw;
+  font-size: 1vw;/*0.885vw;*/
 }
 .label{
   width: 50%;
@@ -221,7 +283,7 @@ export default {
   width: 100%;
   /*background-color: palegreen;*/
   margin-top: 2.604vw; /*50px*/
-  height: 1000px;
+  height: 46.875vw;/*900px;*/
 }
 .circle{
   background-color: lightblue;
@@ -268,19 +330,23 @@ export default {
 }
 .subjectDisplayBox{
   box-sizing: border-box;
-  height: 52.083vw;/*1000px;*//*
+  height: 46.875vw;/*900px;/*
   width: 40%;
   border-right: solid white 20px;/**/
   width: calc(40% - 1.042vw);
   margin-right: 1.042vw;/**/
   background-color: lightblue; border-radius: 10px;
+  overflow: auto;
+  scrollbar-color: #888 #f1f1f1;
+  scrollbar-width: thin;
 }
 .subjectHead{  
   text-align: left;
   /*border-top: solid black 1px;*/
   padding-top: 1.302vw; /*25px*/
   padding-left: 1.302vw;
-  font-size: 1.042vw; /*20px in 1920px width*/ 
+  font-size: 1vw;/*1.042vw; /*20px in 1920px width*/ 
+  font-weight: bold;
 }
 .subjectList{  
   text-align: left;
@@ -290,15 +356,30 @@ export default {
   font-size: 0.833vw; /*16px default*/
 }
 .summaryBox{
-  box-sizing: border-box;  
-  height: 26.042vw;/*500px;*/
-  width: 35%;
-  border-right: solid white 3.125vw; /*60px and 20px*/
-  border-left: solid white 1.042vw;
-  /*width: calc(35% - 4.167vw);
+  box-sizing: border-box;
+  height: 46.875vw;/*900px;/*  
+  /*height: 26.042vw;/*500px;*/
+  /*width: 35%;
+  border-right: solid white 3.125vw;
+  border-left: solid white 1.042vw;/*60px and 20px*/
+  width: calc(35% - 4.167vw);
   margin-right : 3.125vw;
-  margin-left : 1.042vw;*/
-  background-color: lightblue;
+  margin-left : 1.042vw;/**/
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 3em;
 }
+.summRed{
+  color: #8B0000;
+}
+.summGreen{
+  color: #32CD32;
 
+}
+.checkImg{
+  width: 16vw; /*original 440px*/
+  height: 16vw;
+  padding-bottom: 2vw; /*40px*/
+}
 </style>
