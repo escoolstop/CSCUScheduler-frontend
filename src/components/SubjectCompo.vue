@@ -5,17 +5,19 @@ export default {
       message: 'This is SubjectCompo',
       section: 0,
       secOptions: [],
-      timeArr: this.getTimeArray(this.su_time,0)
+      timeArr: this.getTimeArray(this.su_time,0),
+      prevSection: 0,
+      hideValue: false
     }
   },
   props: {
-    su_time: Array,
-    su_sec: Array,
     su_id: String, 
     su_name: String, 
     su_credit: Number, 
     su_level:String,
     su_genre:String,
+    su_time: Array,
+    su_sec: Array,
   },
   methods: {
     getTimeArray(inputList,sec) {
@@ -99,7 +101,15 @@ export default {
         timeArr.push(timeObj);
       }
       return timeArr;
-    }
+    },
+    addSubject(){
+      this.$parent.$data.cart_subj_id.push(this.su_id)
+      this.$parent.$data.cart_subj.push({su_id:this.su_id, su_name:this.su_name, su_credit:this.su_credit, su_level:this.su_level,su_genre:this.su_genre,su_time:this.su_time,su_sec:this.su_sec});
+    },
+    removeSubject(){
+      this.$parent.$data.cart_subj_id = this.$parent.$data.cart_subj_id.filter(x => x != this.su_id);
+      this.$parent.$data.cart_subj = this.$parent.$data.cart_subj.filter(y => y.su_id != this.su_id);
+    },
   },
   mounted(){
     if (this.su_sec.length>1) {
@@ -114,19 +124,107 @@ export default {
 </script>
 
 <template>
-  <p class="greeting">{{ message }} </p>
-  <div>{{this.su_id}} {{this.su_name}} weight: {{this.su_credit}} genre: {{this.su_genre}} time:
-  <select v-model="section" v-if="this.secOptions.length>1" @change="this.timeArr =this.getTimeArray(this.su_time,section)">
+  <div class="outerBox">
+  <div class="topBox"><div class="toptext"><div class="maintext">{{this.su_id}} {{this.su_name}}</div> <div class="notmain"><span>[{{this.su_genre}}]</span><span> [{{this.su_credit}} credits]</span></div></div></div>  
+  <div>
+  <select class="selectButton" v-model="section" @change="this.timeArr=this.getTimeArray(this.su_time,section)"> <!-- v-if="this.secOptions.length>1" in case of use don't want drop down-->
     <option v-for="option in this.secOptions" :key="option.value" :value="option.value">
       {{ option.text }}
     </option>
-  </select> </div>
-  <div v-for="item in timeArr" :key="item.date">{{ item.date }}: {{ item.stTime }} - {{ item.enTime }}</div>  
+  </select>
+  </div>
+  <div class='time'><div v-for="item in timeArr" :key="item.date">{{ item.date }}: {{ item.stTime }} - {{ item.enTime }}</div></div>
+  <div class="buttonPack">
+    <va-button v-if="!this.$parent.$data.cart_subj_id.includes(su_id)" icon="add" class="mr-4" @click="this.addSubject()">Add</va-button>
+    <va-button v-if="this.$parent.$data.cart_subj_id.includes(su_id)" icon="remove" class="mr-4" @click="this.removeSubject()">Remove</va-button>
+  </div>
+  </div>
 </template>
 
 <style scoped>
-.greeting {
-  color: red;
-  font-weight: bold;
+.selectButton{
+  padding: 0.208vw;
+  margin-left: 0.521vw;
+}
+.html {
+  scrollbar-color: #888 #f1f1f1;
+  scrollbar-width: thin;
+}
+.outerBox{
+  margin-bottom: 0.521vw; /**10 */
+  border-radius: 0.208vw;
+  border: solid 1px black;
+  display: flex;/**/
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  /*height: 5.208vw;/*100*/ 
+  width: 80%;
+  /*width: calc(100% - 3px);/*400px 900*/
+  font-size: max(0.833vw, 12px);
+  row-gap: 0.521vw;
+  column-gap: 0.521vw;  
+  margin: auto;
+}
+.topBox{
+  width: 100%;
+}
+.toptext{
+  width: 100%;/*47.917vw;900*/
+  display: flex; 
+  align-items: baseline;
+  gap: 0.521vw; /*10*/
+  box-sizing: border-box;
+  padding-top: 0.260vw; /*5px*/
+  padding-left: 0.260vw;
+}
+.maintext{
+  font-size: 1.25em;
+  position: relative;
+  left: 0;
+  top: 0; 
+  text-align: left;
+}
+.notmain{
+  border: solid 1px black; 
+}
+.time{
+  font-size: 1.1em;
+}
+.bb{
+  border: solid 1px black;
+  display: flex; 
+  flex-wrap: wrap;
+}
+.miniButton{
+  border: 0px;
+  width: max(1.823vw, 25px);
+  height: max(1.823vw, 25px);
+  background-size: 71% 71%;
+  /*width: 1.823vw;
+  height: 1.823vw;
+  background-size: 1.302vw 1.302vw; /*35->25 40->25 image*/
+  border-radius: 50%;
+  background-repeat: no-repeat;
+  background-position: center;
+  transition: 0.3s;
+  background-color: transparent; /*#f1f5f8*/
+  align-self: flex-end;
+  margin-left: auto;
+}
+.miniButton:hover{
+  background-color: #D3D3D3;
+}
+.trash{
+  background-image: url("../assets/trash-solid.svg");
+}
+.eye{
+  background-image: url("../assets/eye-solid.svg");
+}
+.eyeSlash{
+  background-image: url("../assets/eye-slash-solid.svg");
+}
+.buttonPack{
+  align-self: flex-end;
+  margin-left: auto;
 }
 </style>

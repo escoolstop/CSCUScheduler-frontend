@@ -59,25 +59,26 @@ html,body {
   border: 0;
   padding: 0;
   overflow: hidden;
-  background-color: #333;/*
-  background-color: white;
-  border-bottom: solid 1px black;*/
+  background-color: #333;/**/ 
+  /*background-color: transparent;/**/
+  border-bottom: solid 1px black;/**/
 	position: sticky;
 	top: 0;
   width: 100%;
   display: flex;
+  z-index: 1;
 }
 .navbox{
   text-decoration: none;
   display: block;
-  color: white;
-  /*color: black;*/
+  color: white;/**/
+  /*color: #575757;/**/
   text-align: center;
   padding: 0 25px;
   height: 50px;
   display: flex;
   align-items: center;
-  
+  /* font-weight: bold; */
 }
 .navboxstatic{
   text-decoration: none;

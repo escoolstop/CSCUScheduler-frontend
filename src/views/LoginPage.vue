@@ -77,7 +77,11 @@ export default {
   float: left;
   margin-left: 88px;
   font-weight: 800;
-  font-size: 0.8em;
+  font-size: 0.9em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 35px;
 }
 .button:hover {
   background: #2cc06b;

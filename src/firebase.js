@@ -41,3 +41,4 @@ export const useAuthState = () => {
 
   return { user, error, isAuthenticated }
 }
+export const db = firebaseApp.firestore;

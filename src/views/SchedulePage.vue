@@ -3,6 +3,7 @@ import { getAuth, signOut } from 'firebase/auth'
 import { useAuthState } from '../firebase'
 import { useRouter } from 'vue-router'
 import ScheduleSubjectCompo from '../components/ScheduleSubjectCompo.vue'
+import SubjectTest from '../components/SubjectTest.vue'
 export default {
   name: 'SchedulePage',
   data(){
@@ -17,20 +18,23 @@ export default {
                     [],[],[],[],[],[],[],[],[],[],[55],[],[],[],[],[],[],[],[],[],[],[66],
                     [],[],[],[],[],[],[],[],[],[],[77],[],[],[],[],[],[],[],[],[],[],[88],
                     [],[],[],[],[],[],[],[],[],[],[99],[],[],[],[],[],[],[],[],[],[],[110]],*/                 
-      activeSubj:[],
-      inactiveSubj:[],
-      all_subj:[{su_id:'2301111', su_name: 'CALCULUS I', su_credit:3, su_level:'4',su_genre:'CS1',su_time:[[51,52,93,94,95,96],[11,12,13,14,51,52,91,92,93,94,95,96]],su_sec:[1,2]},
-      {su_id:'1234567', su_name: 'FREEDOM OF ASSEMBLY AND LAW', su_credit:3, su_level:'4',su_genre:'CS1',su_time:[[55,56,57,58,59,60],[99,100]],su_sec:[1,2]},
-      {su_id:'9876543', su_name: 'NOT CALC2', su_credit:3, su_level:'4',su_genre:'CS1',su_time:[[55,56,57,58,59,60],[99,100]],su_sec:[1,2]}]
+      midTimeSubj:[],
+      finalTimeSubj:[],
+      all_subj:[{su_id:'2301111', su_name: 'CALCULUS I', su_credit:3, su_level:'4',su_genre:'CS1',su_time:[[51,52,93,94,95,96],[11,12,13,14,51,52,91,92,93,94,95,96]],su_sec:[1,2],su_test:["10-Mar_PM","13-May_PM"]},
+      {su_id:'2301333', su_name: 'FAKE CALC', su_credit:3, su_level:'4',su_genre:'CS1',su_time:[[51,52,93,94,95,96],[11,12,13,14,51,52,91,92,93,94,95,96]],su_sec:[1,2],su_test:["TDF","TDF"]},
+                {su_id:'1234567', su_name: 'FREEDOM OF ASSEMBLY AND LAW1121321321', su_credit:3, su_level:'4',su_genre:'CS-CORE',su_time:[[55,56,57,58,59,60],[99,100]],su_sec:[1,2],su_test:["10-Mar_AM","13-May_AM"]},
+                {su_id:'9876543', su_name: 'NOT CALC2', su_credit:3, su_level:'4',su_genre:'CS1',su_time:[[55,56,57,58,59,60],[99,100]],su_sec:[1,2],su_test:["9-Feb_PM","13-May_PM"]},
+                {su_id:'9876544', su_name: 'NOT CALC2', su_credit:3, su_level:'4',su_genre:'CS1',su_time:[[55,56,57,58,59,60],[99,100]],su_sec:[1,2],su_test:["9-Feb_PM","13-May_PM"]},
+                {su_id:'9876545', su_name: 'NOT CALC2', su_credit:3, su_level:'4',su_genre:'CS1',su_time:[[55,56,57,58,59,60]],su_sec:[1],su_test:["9-Feb_PM","13-May_PM"]}]
     }
   },
   components: {
-    ScheduleSubjectCompo
+    ScheduleSubjectCompo,
+    SubjectTest
   },
   setup() {
     const { user } = useAuthState()
     const auth = getAuth()
-
     const router = useRouter()
     const signOutUser = async () => {
       try {
@@ -48,19 +52,53 @@ export default {
       for (var i = 0; i < subjectTimeArray.length; i++) {
         this.scheduleArray[subjectTimeArray[i]-1].push(subject_id);
       }
+      this.addTimeSubject(subject_id);
     },
-    removeSubject(subject_id,subjectTimeArray) {
+    hideSubject(subject_id,subjectTimeArray) { // hide subject
       for (var i = 0; i < subjectTimeArray.length; i++) {
         this.scheduleArray[subjectTimeArray[i]-1] = this.scheduleArray[subjectTimeArray[i]-1].filter(x => x != subject_id);
       }
+      this.removeTimeSubject(subject_id);
+    },
+    trashSubject(subject_id){ //delete from all subject
+      this.all_subj = this.all_subj.filter( subject => subject.su_id != subject_id)
+      this.removeTimeSubject(subject_id);
+      //code to remove subject from student schedule array is here
     },
     addAllSubject(){
       for (var i = 0; i < this.all_subj.length; i++) {
-      this.addSubject(this.all_subj[i].su_id,this.all_subj[i].su_time[0]);
-    }
+        this.addSubject(this.all_subj[i].su_id,this.all_subj[i].su_time[0]);
+        //this.addTimeSubject(this.all_subj[i].su_id); // addTimeSubject but loop = addAllTimeSubject()
+      }
     },
-    trashSubject(subject_id){
-      this.all_subj = this.all_subj.filter( subject => subject.su_id != subject_id)
+    sortByTime(){
+      this.midTimeSubj.sort( (a, b) => (a.su_time[2] >= b.su_time[2]) ? 1 : -1 );
+      this.midTimeSubj.sort( (a, b) => (a.su_time[0] >= b.su_time[0]) ? 1 : -1 );
+      this.midTimeSubj.sort( (a, b) => (a.su_time[1] >= b.su_time[1]) ? 1 : -1 );
+      this.finalTimeSubj.sort( (a, b) => (a.su_time[2] >= b.su_time[2]) ? 1 : -1 );
+      this.finalTimeSubj.sort( (a, b) => (a.su_time[0] >= b.su_time[0]) ? 1 : -1 );
+      this.finalTimeSubj.sort( (a, b) => (a.su_time[1] >= b.su_time[1]) ? 1 : -1 );
+    },
+    addTimeSubject(subject_id){ //timeSlot 0 for mid / 1 for final
+      var subjObject = this.all_subj.find(x => x.su_id == subject_id)
+      if (subjObject.su_test[0] == "TDF") { 
+        this.midTimeSubj.push({su_id:subjObject.su_id, su_name:subjObject.su_name, su_time:["TDF"]});
+        this.finalTimeSubj.push({su_id:subjObject.su_id, su_name:subjObject.su_name, su_time:["TDF"]}) 
+      }
+      else {
+        var monthMap = { Jan:'1', Feb:'2', Mar:'3', Apr:'4', May:'5', Jun:'6', Jul:'7', Aug:'8', Sep:'9', Oct:'10', Nov:'11', Dec:'12',}
+        var testTime = subjObject.su_test[0].split(/-|_/);
+        testTime[1] = monthMap[testTime[1]]
+        this.midTimeSubj.push({su_id:subjObject.su_id, su_name:subjObject.su_name, su_time:testTime})
+        testTime = subjObject.su_test[1].split(/-|_/);
+        testTime[1] = monthMap[testTime[1]]
+        this.finalTimeSubj.push({su_id:subjObject.su_id, su_name:subjObject.su_name, su_time:testTime})
+      }
+      this.sortByTime();
+    },
+    removeTimeSubject(subject_id){
+      this.midTimeSubj = this.midTimeSubj.filter (subject => subject.su_id != subject_id)
+      this.finalTimeSubj = this.finalTimeSubj.filter (subject => subject.su_id != subject_id)
     }
   },
   mounted() {
@@ -74,12 +112,13 @@ export default {
     <router-link to="/home" style="text-decoration: none; color: inherit;"><div class="navbox">Home</div></router-link>
     <router-link to="/subject" style="text-decoration: none; color: inherit;"><div class="navbox">Subject</div></router-link>
     <router-link to="/schedule" style="text-decoration: none; color: inherit;"><div class="navbox">Schedule</div></router-link>
-    <router-link to="/history" style="text-decoration: none; color: inherit;"><div class="navbox">Weight</div></router-link>
-    <div class="navboxstatic" style="margin-left: auto;">{{ user?.email }}</div>
+    <router-link to="/history" style="text-decoration: none; color: inherit;"><div class="navbox">History</div></router-link>
+    <div class="navbox" style="margin-left: auto;">{{ user?.email }}</div>
     <div class="navbox" @click="signOutUser">Sign Out</div>
   </div>
   <!--h1>Welcome {{ user?.email }}!</h1>
   <button @click="signOutUser">Sign Out</button-->
+  <div class="wrapRtable">
   <div class="Rtable">
     <!--div class="overlay">2301369<br>DATA COMM I</div>
     <div class="overlay a">I'M HERE</div>
@@ -115,9 +154,11 @@ export default {
     <div class="Rtable-cell head rowH">FRI</div>
     <div class="Rtable-cell inner" v-for="subArray in scheduleArray.slice(88, 110)" :key="subArray" :class="{redTimeSlot: subArray.length>1}"><div v-for="subId in subArray" :key="subId">{{subId}}</div></div>
       
-  </div>
+  </div> </div>
   <div class="lowerhalf">
   <div class="subjforSchedule"><ScheduleSubjectCompo v-for="item in this.all_subj" v-bind="item" :key="item.su_id"></ScheduleSubjectCompo></div>
+  <div class="testDisplay">MID<SubjectTest v-for="item in this.midTimeSubj" v-bind="item" :key="item.su_id" :class="{active: item.su_time}"></SubjectTest></div>
+  <div class="testDisplay">FINAL<SubjectTest v-for="item in this.finalTimeSubj" v-bind="item" :key="item.su_id" :class="{active: item.su_time}"></SubjectTest></div>
   </div>
 </template>
 <style scope>
@@ -135,6 +176,10 @@ html {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 16px;
 }
+.wrapRtable{
+  width: 100%;
+  overflow-x: auto;
+}
 .Rtable {
   margin: 0 1%;
   position: relative;
@@ -143,7 +188,7 @@ html {
   padding: 0;
   align-self: center;
   width: 98%;
-  /*min-width: 1440px;*/
+  min-width: 1440px;/**/
   font-size: max(0.833vw, 12px);/*16px with min 12px*/
   margin-top: 50px;
 }
@@ -161,7 +206,7 @@ html {
   text-overflow: ellipsis;
   text-align: center;
   align-items: center;
-  height: 5.208vw;
+  height: max(5.208vw, 70px); /*75px for 1440*/
   /*height: 5.208vw;/*100px;*/
   
   
@@ -179,8 +224,11 @@ html {
   align-items: center;
 }
 .columnH {
-  height: 2.604vw;/*50px;*/
-  padding: 0.781vw 0;/*15px 0;*/
+  height: max(2.604vw, 35px);/*50px;*/
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /*padding: 0.781vw 0;/*15px 0;*/
   width: 8.6%;
   border-top-style: solid;
   border-left-style: none;
@@ -188,9 +236,12 @@ html {
 .edge {
   border-left-style: solid;
   border-top-style: solid;
-  height: 2.604vw;/*50px;*/
+  height: max(2.604vw, 35px);/*50px;*/
   width: 5.4%;
-  padding: 0.781vw 0;/*15px 0;*/
+  /*padding: 0.781vw 0;/*15px 0;*/
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .inner {
   border-left-style: none;
@@ -204,13 +255,24 @@ html {
   margin: 1.5vw 2%;
   width: 96%;
   display: flex;
-  justify-content: left;
+  justify-content: center;
   align-items: top;
-  border: solid black 1px;
-  height: 17.5vw;
+  height: auto;
+  column-gap: 20px;
 }
 .subjforSchedule{
+  width: 40%;
   overflow:auto;
+  scrollbar-color: #888 #f1f1f1;
+  scrollbar-width: thin;
+}
+.testDisplay{
+  width: 25%;
+  overflow:auto;
+  scrollbar-color: #888 #f1f1f1;
+  scrollbar-width: thin;
+  font-size: 20px;
+  text-align: left; 
 }
 
 

@@ -89,9 +89,19 @@ export default {
     /*axios
       .get('https://api.coindesk.com/v1/bpi/currentprice.json')
       .then(response => (this.info = response))*/
-    axios.post('http://localhost:3000/subject/querySubject',{
+    /* axios.post('http://localhost:3000/subject/querySubject',{
       id: '5500112'
-    }).then(response => (this.info=(response.data)))////(this.info.push(response.data.su_time).catch(err => console.log(err))))//(this.info = response.data))*/
+    }).then(response => (this.info=(response.data))) */////(this.info.push(response.data.su_time).catch(err => console.log(err))))//(this.info = response.data))*/
+
+    /* axios.get('https://us-central1-cscuscheduler.cloudfunctions.net/api/subject/querySubject',{
+      params: { id: '5500112' }, headers:{"Access-Control-Allow-Origin":"*"}
+    }).then(response => (this.info=(response.data)))  */
+    
+    axios.get('https://us-central1-cscuscheduler.cloudfunctions.net/api/student/queryStudent',{
+      params: { id: '6133762823' }, headers:{"Access-Control-Allow-Origin":"*"}
+    }).then(response => (this.info=(response.data))) 
+
+
     //console.log(this.info)
   },
   methods: {
@@ -241,7 +251,7 @@ export default {
       test id:{{ item[0] }} number:{{ item.number }}
     </div>
   </div>
-  {{info}}
+  API Call Here: {{info}}
 </template>
 
 <style scope>
