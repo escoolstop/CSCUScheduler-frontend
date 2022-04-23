@@ -22,11 +22,12 @@ export default {
     }
 
     return { handleSubmit }
-  }
+  },
 }
 </script>
 
 <template>
+<div class="background">
   <div id="absoluteCenteredDiv">
     <form @submit.prevent="handleSubmit">
       <div class="box">
@@ -40,11 +41,17 @@ export default {
       Don't have an account?
       <router-link to="/register">Sign up here</router-link>
     </p>
-  </div>
+  </div> 
+</div>
   <!--div><Test></Test></div-->
 </template>
 
-<style>
+<style scoped>
+.background{
+  background-image: url("../assets/cool-background.png");
+  width: 100vw;
+  height: 100vh;
+}
 .box {
   background: skyblue;
   width: 300px;
@@ -60,7 +67,7 @@ export default {
   padding: 8px;
   width: 250px;
   color: #000000;
-  margin-top: 10px;
+  margin-top: 10px; 
   font-size: 1em;
   border-radius: 4px;
 }

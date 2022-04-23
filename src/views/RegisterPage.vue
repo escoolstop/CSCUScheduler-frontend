@@ -23,6 +23,7 @@ export default {
 </script>
 
 <template>
+<div class="background">
   <div id="absoluteCenteredDiv">
     <form @submit.prevent="handleSubmit">
       <div class="box">
@@ -36,9 +37,15 @@ export default {
       Already have an account? <router-link to="/login">Login here</router-link>
     </p>
   </div>
+</div>
 </template>
 
-<style>
+<style scoped>
+.background{
+  background-image: url("../assets/cool-background.png");
+  width: 100vw;
+  height: 100vh;
+}
 .box {
   background: skyblue;
   width: 300px;
@@ -63,7 +70,7 @@ export default {
   width: 125px;
   padding-top: 5px;
   padding-bottom: 5px;
-  color: white;
+  color: white; 
   border-radius: 4px;
   border: #27ae60 1px solid;
   margin-top: 20px;
@@ -71,7 +78,11 @@ export default {
   float: left;
   margin-left: 88px;
   font-weight: 800;
-  font-size: 0.8em;
+  font-size: 0.9em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 35px;
 }
 .button:hover {
   background: #2cc06b;

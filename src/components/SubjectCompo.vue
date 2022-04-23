@@ -13,7 +13,7 @@ export default {
   props: {
     su_id: String, 
     su_name: String, 
-    su_credit: Number, 
+    su_credit: String, 
     su_level:String,
     su_genre:String,
     su_time: Array,
@@ -109,15 +109,15 @@ export default {
     removeSubject(){
       this.$parent.$data.cart_subj_id = this.$parent.$data.cart_subj_id.filter(x => x != this.su_id);
       this.$parent.$data.cart_subj = this.$parent.$data.cart_subj.filter(y => y.su_id != this.su_id);
+      this.$parent.$data.inDB_subj_id = this.$parent.$data.inDB_subj_id.filter(x => x != this.su_id);
+      this.$parent.$data.inDB_subj = this.$parent.$data.inDB_subj.filter(y => y.su_id != this.su_id);
     },
   },
   mounted(){
-    if (this.su_sec.length>1) {
-      for (var k = 0; k < this.su_sec.length; k++) {
-        var singleOption = {text: '',value: k};
-        singleOption.text = this.su_sec[k];
-        this.secOptions.push(singleOption)
-      }
+    for (var k = 0; k < this.su_sec.length; k++) {
+      var singleOption = {text: '',value: k};
+      singleOption.text = this.su_sec[k];
+      this.secOptions.push(singleOption)
     }
   }
 }
@@ -125,19 +125,19 @@ export default {
 
 <template>
   <div class="outerBox">
-  <div class="topBox"><div class="toptext"><div class="maintext">{{this.su_id}} {{this.su_name}}</div> <div class="notmain"><span>[{{this.su_genre}}]</span><span> [{{this.su_credit}} credits]</span></div></div></div>  
-  <div>
-  <select class="selectButton" v-model="section" @change="this.timeArr=this.getTimeArray(this.su_time,section)"> <!-- v-if="this.secOptions.length>1" in case of use don't want drop down-->
-    <option v-for="option in this.secOptions" :key="option.value" :value="option.value">
-      {{ option.text }}
-    </option>
-  </select>
-  </div>
-  <div class='time'><div v-for="item in timeArr" :key="item.date">{{ item.date }}: {{ item.stTime }} - {{ item.enTime }}</div></div>
-  <div class="buttonPack">
-    <va-button v-if="!this.$parent.$data.cart_subj_id.includes(su_id)" icon="add" class="mr-4" @click="this.addSubject()">Add</va-button>
-    <va-button v-if="this.$parent.$data.cart_subj_id.includes(su_id)" icon="remove" class="mr-4" @click="this.removeSubject()">Remove</va-button>
-  </div>
+    <div class="topBox"><div class="toptext"><div class="maintext">{{this.su_id}} {{this.su_name}}</div> <div class="notmain"><span>[{{this.su_genre}}]</span><span> [{{this.su_credit}} credits]</span></div></div></div>  
+    <div>
+      <select class="selectButton" v-model="section" @change="this.timeArr=this.getTimeArray(this.su_time,section)"> <!-- v-if="this.secOptions.length>1" in case of use don't want drop down-->
+      <option v-for="option in this.secOptions" :key="option.value" :value="option.value">
+        {{ option.text }}
+      </option>
+    </select>
+    </div>
+    <div class='time'><div v-for="item in timeArr" :key="item.date">{{ item.date }}: {{ item.stTime }} - {{ item.enTime }}</div></div>
+      <div class="buttonPack">
+        <va-button v-if="!(this.$parent.$data.cart_subj_id.includes(su_id) || this.$parent.$data.inDB_subj_id.includes(su_id))" icon="add" class="mr-4" @click="this.addSubject()">Add</va-button>
+        <va-button v-if="(this.$parent.$data.cart_subj_id.includes(su_id) || this.$parent.$data.inDB_subj_id.includes(su_id))" icon="remove" class="mr-4" @click="this.removeSubject()">Remove</va-button>
+    </div>
   </div>
 </template>
 
@@ -151,19 +151,21 @@ export default {
   scrollbar-width: thin;
 }
 .outerBox{
-  margin-bottom: 0.521vw; /**10 */
+  margin-bottom: 2vh; /**10 */
   border-radius: 0.208vw;
-  border: solid 1px black;
+  outline: solid 1px black;
   display: flex;/**/
   flex-wrap: wrap;
   justify-content: flex-start;
   /*height: 5.208vw;/*100*/ 
-  width: 80%;
+  /* width: 80%; */
+  width: 40vw;
+  margin: 0px 5vw;
+  margin-bottom: 2vh;
   /*width: calc(100% - 3px);/*400px 900*/
   font-size: max(0.833vw, 12px);
   row-gap: 0.521vw;
   column-gap: 0.521vw;  
-  margin: auto;
 }
 .topBox{
   width: 100%;
@@ -184,9 +186,9 @@ export default {
   top: 0; 
   text-align: left;
 }
-.notmain{
+/* .notmain{
   border: solid 1px black; 
-}
+} */
 .time{
   font-size: 1.1em;
 }

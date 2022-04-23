@@ -15,7 +15,7 @@ export default {
     su_sec: Array,
     su_id: String, 
     su_name: String, 
-    su_credit: Number, 
+    su_credit: String, 
     su_level:String,
     su_genre:String,
   },
@@ -163,6 +163,7 @@ export default {
   scrollbar-width: thin;
 }
 .outerBox{
+  margin-top: 0.260vw;
   margin-bottom: 0.521vw; /**10 */
   border-radius: 0.208vw;
   border: solid 1px black;
@@ -194,9 +195,9 @@ export default {
   top: 0; 
   text-align: left;
 }
-.notmain{
+/* .notmain{
   border: solid 1px black; 
-}
+} */
 .time{
   font-size: 1.1em;
 }

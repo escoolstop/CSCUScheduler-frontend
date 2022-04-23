@@ -1,0 +1,26 @@
+Don't have an account?
+      <router-link to="/register">Sign up here</router-link>
+
+
+      Already have an account? <router-link to="/login">Login here</router-link>
+
+
+  <div class="navbar">
+    <router-link to="/home" style="text-decoration: none; color: inherit;"><div class="navbox">Home</div></router-link>
+    <router-link to="/subject" style="text-decoration: none; color: inherit;"><div class="navbox">Subject</div></router-link>
+    <router-link to="/schedule" style="text-decoration: none; color: inherit;"><div class="navbox">Schedule</div></router-link>
+    <router-link to="/history" style="text-decoration: none; color: inherit;"><div class="navbox">History</div></router-link>
+    <div class="navbox" style="margin-left: auto;">{{ user?.email }}</div>
+    <div class="navbox" @click="signOutUser">Sign Out</div>
+  </div>
+
+
+
+this.midTimeSubj.sort( (a, b) => (a.su_time[0] > b.su_time[0]) ? 1 : -1 );
+      this.midTimeSubj.sort( (a, b) => (parseInt(a.su_time[0]) > parseInt(b.su_time[0])) ? 1 : -1 );
+      this.midTimeSubj.sort( (a, b) => (a.su_time[1] > b.su_time[1]) ? 1 : -1 );
+
+
+      this.midTimeSubj.sort( (a, b) => (a.su_time[2] >= b.su_time[2]) ? 1 : -1 );
+      this.midTimeSubj.sort( (a, b) => (a.su_time[0] >= b.su_time[0]) ? 1 : -1 );
+      this.midTimeSubj.sort( (a, b) => (a.su_time[1] >= b.su_time[1]) ? 1 : -1 );

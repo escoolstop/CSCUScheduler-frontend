@@ -49,7 +49,7 @@ export default {
       how5:test5,
       leng:len,
       array1:test,
-      info:["something"],
+      info:"nothing",
       timeArray:['idk'],
       //impromtu:student
     }
@@ -93,21 +93,43 @@ export default {
       id: '5500112'
     }).then(response => (this.info=(response.data))) */////(this.info.push(response.data.su_time).catch(err => console.log(err))))//(this.info = response.data))*/
 
-    /* axios.get('https://us-central1-cscuscheduler.cloudfunctions.net/api/subject/querySubject',{
-      params: { id: '5500112' }, headers:{"Access-Control-Allow-Origin":"*"}
+  /*   axios.get('https://us-central1-cscuscheduler.cloudfunctions.net/api/subject/querySubject',{
+      params: { id: '2301217' }, headers:{"Access-Control-Allow-Origin":"*"}
     }).then(response => (this.info=(response.data)))  */
     
-    axios.get('https://us-central1-cscuscheduler.cloudfunctions.net/api/student/queryStudent',{
-      params: { id: '6133762823' }, headers:{"Access-Control-Allow-Origin":"*"}
-    }).then(response => (this.info=(response.data))) 
+    /* axios.get('https://us-central1-cscuscheduler.cloudfunctions.net/api/subject/querySubject',{
+      params: { id: '3404131' }, headers:{"Access-Control-Allow-Origin":"*"}
+    }).then(response => (this.info=(response.data)))  */
 
+    /* axios.get('https://us-central1-cscuscheduler.cloudfunctions.net/api/credit/queryCredit',{
+      params: { id: '1' }, headers:{"Access-Control-Allow-Origin":"*"}
+    }).then(response => (this.info=(response.data))) */
+
+    /* axios.get('https://us-central1-cscuscheduler.cloudfunctions.net/api/subject/MultSubject',{
+      params: { id: "[2301250,2304103]" }, headers:{"Access-Control-Allow-Origin":"*"}
+    }).then(response => (this.info=(response.data))) */
+    
+
+    /* axios.put('https://us-central1-cscuscheduler.cloudfunctions.net/api/student/updateSubject',{
+      params: { id: '6133762823', data: '[1234567,7654321]' }, headers:{"Access-Control-Allow-Origin":"*"}
+    }).then(response => (this.info=(response.data))).catch(error => { console.log(error) })   */
+
+    /* axios.get('https://us-central1-cscuscheduler.cloudfunctions.net/api/student/queryStudent',{
+      params: { id: '6133762823' }, headers:{"Access-Control-Allow-Origin":"*"}
+    }).then(response => (this.info=(response.data))) */
 
     //console.log(this.info)
   },
-  methods: {
+  methods: {  
     //myFunction() { document.getElementById("demo").innerHTML = "demo"+arra+"/157"; }
     test() //{ console.log(typeof(this.info))},
-    { console.log(JSON.parse(this.info.su_time)) }, 
+    { 
+      console.log(this.info.su_time)
+      console.log(JSON.parse(this.info.su_time))
+      console.log(this.info.su_sec)
+      console.log(JSON.parse(this.info.su_sec))
+      console.log(this.info.su_test.slice(1, -1).split(","))
+    }, 
     //{ console.log(typeof(this.info.su_time))},
     myFunction() { this.how.push([123]); },
     getTimeArray(inputList,sec) {

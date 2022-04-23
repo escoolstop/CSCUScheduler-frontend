@@ -20,12 +20,13 @@ export default {
                     [],[],[],[],[],[],[],[],[],[],[99],[],[],[],[],[],[],[],[],[],[],[110]],*/                 
       midTimeSubj:[],
       finalTimeSubj:[],
-      all_subj:[{su_id:'2301111', su_name: 'CALCULUS I', su_credit:3, su_level:'4',su_genre:'CS1',su_time:[[51,52,93,94,95,96],[11,12,13,14,51,52,91,92,93,94,95,96]],su_sec:[1,2],su_test:["10-Mar_PM","13-May_PM"]},
-      {su_id:'2301333', su_name: 'FAKE CALC', su_credit:3, su_level:'4',su_genre:'CS1',su_time:[[51,52,93,94,95,96],[11,12,13,14,51,52,91,92,93,94,95,96]],su_sec:[1,2],su_test:["TDF","TDF"]},
-                {su_id:'1234567', su_name: 'FREEDOM OF ASSEMBLY AND LAW1121321321', su_credit:3, su_level:'4',su_genre:'CS-CORE',su_time:[[55,56,57,58,59,60],[99,100]],su_sec:[1,2],su_test:["10-Mar_AM","13-May_AM"]},
-                {su_id:'9876543', su_name: 'NOT CALC2', su_credit:3, su_level:'4',su_genre:'CS1',su_time:[[55,56,57,58,59,60],[99,100]],su_sec:[1,2],su_test:["9-Feb_PM","13-May_PM"]},
-                {su_id:'9876544', su_name: 'NOT CALC2', su_credit:3, su_level:'4',su_genre:'CS1',su_time:[[55,56,57,58,59,60],[99,100]],su_sec:[1,2],su_test:["9-Feb_PM","13-May_PM"]},
-                {su_id:'9876545', su_name: 'NOT CALC2', su_credit:3, su_level:'4',su_genre:'CS1',su_time:[[55,56,57,58,59,60]],su_sec:[1],su_test:["9-Feb_PM","13-May_PM"]}]
+      all_subj:[{ "su_level": "2", "su_credit": "3", "su_sec": [1], "su_name": "FREEDOM OF ASSEMBLY AND LAW", "su_test": ["TDF","TDF"], "su_time": [[77,78,79,80,81,82]], "su_genre": "GEN-SO", "su_id": "3404131" },
+      { "su_name": "GENERAL PHYSICS I", "su_credit": "3", "su_sec": [1], "su_genre": "SC-CORE", "su_test": ["11-Mar_PM","18_May_PM"], "su_id": "2304103", "su_time": [[40,41,42,82,83,84]], "su_level": "4" },      
+      { "su_name": "CALCULUS III", "su_id": "2301217", "su_sec": [1], "su_genre": "CS-CORE", "su_credit": "3", "su_level": "4", "su_test": ["8-Mar_PM","12-May_PM"], "su_time": [[9,10,75,76,97,98]] },
+      { "su_test": ["TDF","TDF"], "su_id": "5500112", "su_level": "2", "su_name": "EXPERIENTIAL ENGLISH II", "su_genre": "GEN-LANG", "su_credit": "3", "su_time": [[11,12,13,14,15,16],[11,12,13,14,15,16],[11,12,13,14,15,16]], "su_sec": [29,30,31] }],
+                /* {su_id:'9876543', su_name: 'NOT CALC2', su_credit:"3", su_level:'4',su_genre:'CS1',su_time:[[55,56,57,58,59,60],[99,100]],su_sec:[1,2],su_test:["9-Feb_PM","13-May_PM"]},
+                {su_id:'9876544', su_name: 'NOT CALC2', su_credit:"3", su_level:'4',su_genre:'CS1',su_time:[[55,56,57,58,59,60],[99,100]],su_sec:[1,2],su_test:["9-Feb_PM","13-May_PM"]},
+                {su_id:'9876545', su_name: 'NOT CALC2', su_credit:"3", su_level:'4',su_genre:'CS1',su_time:[[55,56,57,58,59,60]],su_sec:[1],su_test:["9-Feb_PM","13-May_PM"]}] */
     }
   },
   components: {
@@ -73,11 +74,14 @@ export default {
     },
     sortByTime(){
       this.midTimeSubj.sort( (a, b) => (a.su_time[2] >= b.su_time[2]) ? 1 : -1 );
-      this.midTimeSubj.sort( (a, b) => (a.su_time[0] >= b.su_time[0]) ? 1 : -1 );
-      this.midTimeSubj.sort( (a, b) => (a.su_time[1] >= b.su_time[1]) ? 1 : -1 );
+      this.midTimeSubj.sort( (a, b) => (a.su_time[0] > b.su_time[0]) ? 1 : -1 );
+      this.midTimeSubj.sort( (a, b) => (parseInt(a.su_time[0]) > parseInt(b.su_time[0])) ? 1 : -1 );
+      this.midTimeSubj.sort( (a, b) => (a.su_time[1] > b.su_time[1]) ? 1 : -1 );
       this.finalTimeSubj.sort( (a, b) => (a.su_time[2] >= b.su_time[2]) ? 1 : -1 );
-      this.finalTimeSubj.sort( (a, b) => (a.su_time[0] >= b.su_time[0]) ? 1 : -1 );
-      this.finalTimeSubj.sort( (a, b) => (a.su_time[1] >= b.su_time[1]) ? 1 : -1 );
+      this.finalTimeSubj.sort( (a, b) => (a.su_time[0] > b.su_time[0]) ? 1 : -1 );
+      this.finalTimeSubj.sort( (a, b) => (parseInt(a.su_time[0]) > parseInt(b.su_time[0])) ? 1 : -1 );
+      this.finalTimeSubj.sort( (a, b) => (a.su_time[1] > b.su_time[1]) ? 1 : -1 );
+      //console.log(this.midTimeSubj);
     },
     addTimeSubject(subject_id){ //timeSlot 0 for mid / 1 for final
       var subjObject = this.all_subj.find(x => x.su_id == subject_id)
@@ -103,6 +107,7 @@ export default {
   },
   mounted() {
     this.addAllSubject();
+    this.all_subj.sort( (a, b) => ( a.su_id > b.su_id) ? 1:-1);
   }
 }
 </script>
@@ -156,9 +161,9 @@ export default {
       
   </div> </div>
   <div class="lowerhalf">
-  <div class="subjforSchedule"><ScheduleSubjectCompo v-for="item in this.all_subj" v-bind="item" :key="item.su_id"></ScheduleSubjectCompo></div>
-  <div class="testDisplay">MID<SubjectTest v-for="item in this.midTimeSubj" v-bind="item" :key="item.su_id" :class="{active: item.su_time}"></SubjectTest></div>
-  <div class="testDisplay">FINAL<SubjectTest v-for="item in this.finalTimeSubj" v-bind="item" :key="item.su_id" :class="{active: item.su_time}"></SubjectTest></div>
+  <div class="subjforSchedule">Subject List<ScheduleSubjectCompo v-for="item in this.all_subj" v-bind="item" :key="item.su_id"></ScheduleSubjectCompo></div>
+  <div class="testDisplay">Midterm Schedule<SubjectTest v-for="item in this.midTimeSubj" v-bind="item" :key="item.su_id" :class="{active: item.su_time}"></SubjectTest></div>
+  <div class="testDisplay">Final Schedule<SubjectTest v-for="item in this.finalTimeSubj" v-bind="item" :key="item.su_id" :class="{active: item.su_time}"></SubjectTest></div>
   </div>
 </template>
 <style scope>
@@ -255,23 +260,25 @@ html {
   margin: 1.5vw 2%;
   width: 96%;
   display: flex;
-  justify-content: center;
+  justify-content: space-around;
   align-items: top;
   height: auto;
-  column-gap: 20px;
+  /* column-gap: 20px; */
 }
 .subjforSchedule{
   width: 40%;
   overflow:auto;
   scrollbar-color: #888 #f1f1f1;
   scrollbar-width: thin;
+  font-size: 25px;
+  text-align: left; 
 }
 .testDisplay{
   width: 25%;
   overflow:auto;
   scrollbar-color: #888 #f1f1f1;
   scrollbar-width: thin;
-  font-size: 20px;
+  font-size: 25px;
   text-align: left; 
 }
 

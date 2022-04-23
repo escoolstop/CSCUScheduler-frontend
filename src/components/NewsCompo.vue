@@ -19,7 +19,9 @@ export default {
 </script>
 
 <template>
- <div class="outerBox">{{ ann_id }} {{ ann_des }}</div>
+ <div class="outerBox">
+   <div class="full">{{ ann_des }}</div>
+  </div>
 </template>
 
 <style scoped>
@@ -29,10 +31,17 @@ export default {
 }
 .outerBox{
   border: solid 1px black;
-  width: 500px;
-  padding: 10px 20px;
-  margin: 10px auto;
+  width: 40vw;/* 500px; */
+  min-width: 700px;
+  padding: 20px 20px;
+  margin: 30px auto;
   text-align: left;
   border-radius: 0.208vw;
+  display:flex;
+  flex-wrap: wrap;
+  row-gap: 20px;
+}
+.full{
+  width: 100%;
 }
 </style>

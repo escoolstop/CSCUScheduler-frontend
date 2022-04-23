@@ -127,7 +127,6 @@ export default {
     }
   },
   created(){
-    //this.subj5.push({su_id:123,su_credit:3})
     this.sortSubjByGenre(this.subjAll, this.subj2_1, 'CS-CORE', 43)
     this.sortSubjByGenre(this.subjAll, this.subj3, 'SC-CORE', 31)
     this.sortSubjById(this.subjAll, this.subj2_2, ['2301361','2301367','2301369'], 6)
@@ -291,7 +290,7 @@ export default {
   height: 45em;/* 46.875vw; *//*900px;*/
   width: 94em;/*96em; *//*100% */
   /* overflow-x: auto; */
-  font-size: max(1.042vw, 15px); /*20 px*/
+  font-size: min(max(1.042vw, 15px), 20px); /*20 px*/
 }
 .activeLabel{
   border: solid #2c3e50 2px;
