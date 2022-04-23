@@ -3,7 +3,7 @@ import { getAuth, signOut } from 'firebase/auth'
 import { useAuthState } from '../firebase'
 import { useRouter } from 'vue-router'
 import ScheduleSubjectCompo from '../components/ScheduleSubjectCompo.vue'
-import SubjectTest from '../components/SubjectTest.vue'
+import SubjectTest from '../components/SubjectTestCompo.vue'
 export default {
   name: 'SchedulePage',
   data(){
