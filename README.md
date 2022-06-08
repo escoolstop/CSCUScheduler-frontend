@@ -1,5 +1,5 @@
 # firebasevue3
-CSCUScheduler is a senior project about web application that can creates scheduler from selected course and tracks previously selected course. CSCUScheduler is developed with JavaScript, Vue.js Framework, Node.js and Firebase.
+CSCUScheduler is a senior project about web application that can create scheduler from selected course and tracks previously selected course. CSCUScheduler is developed with JavaScript, Vue.js Framework, Node.js and Firebase.
 
 ## Project setup
 ```
