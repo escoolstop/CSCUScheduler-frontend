@@ -80,7 +80,7 @@ html,body {
   align-items: center;
   /* font-weight: bold; */
 }
-.navboxstatic{
+.navboxactive{
   text-decoration: none;
   display: block;
   color: white;
@@ -89,6 +89,7 @@ html,body {
   height: 50px;
   display: flex;
   align-items: center;
+  background:linear-gradient(#4EBA6F,#4EBA6F) bottom/100% 4px no-repeat;
 }
 .left{
   float: left;

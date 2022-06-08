@@ -11,13 +11,13 @@ export default {
     }
   },
   props: {
-    su_time: Array,
-    su_sec: Array,
     su_id: String, 
     su_name: String, 
     su_credit: String, 
     su_level:String,
     su_genre:String,
+    su_time: Array,
+    su_sec: Array,
   },
   methods: {
     getTimeArray(inputList,sec) {
@@ -48,7 +48,7 @@ export default {
           case 4: timeObj.date = 'FRI'; break;
           default: break;
         }
-        switch ((startTime-1)%22) {
+        switch ((startTime%22)-1) {
           case 0: timeObj.stTime = '8:00'; break;
           case 1: timeObj.stTime = '8:30'; break;
           case 2: timeObj.stTime = '9:00'; break;
@@ -73,7 +73,7 @@ export default {
           case 21: timeObj.stTime = '18:30'; break;
           default: break;
         }
-        switch ((endTime-1)%22) {
+        switch ((endTime%22)-1) {
           case 0: timeObj.enTime = '8:30'; break;
           case 1: timeObj.enTime = '9:00'; break;
           case 2: timeObj.enTime = '9:30'; break;
@@ -102,81 +102,78 @@ export default {
       }
       return timeArr;
     },
-    changeSection(){
-      if (this.hideValue == false) {
-      this.$parent.hideSubject(this.su_id,this.su_time[this.prevSection]);
-      this.$parent.addSubject(this.su_id,this.su_time[this.section]);
-      }
-      this.prevSection = this.section;
+    addSubject(){
+      this.$parent.$parent.$data.cart_subj_id.push(this.su_id) //this.$parent.$parent.$data.cart_subj_id.push(parseInt(this.su_id))
+      this.$parent.$parent.$data.cart_subj.push({su_id:this.su_id, su_name:this.su_name, su_credit:this.su_credit, su_level:this.su_level,su_genre:this.su_genre,su_time:this.su_time,su_sec:this.su_sec});
+      this.$parent.$parent.$data.cart_subj.sort( (a, b) => ( parseInt(a.su_id) > parseInt(b.su_id)) ? 1:-1);
     },
-    trashSubjectChild(){
-      if (confirm('Do you want to remove [ '+this.su_id+' '+this.su_name+' ] from your schedule?')){
-        this.$parent.hideSubject(this.su_id,this.su_time[this.section]);
-        this.$parent.trashSubject(this.su_id)
-      }else { return; }
+    removeSubject(){
+  
+      this.$parent.$parent.$data.cart_subj_id = this.$parent.$parent.$data.cart_subj_id.filter(x => x != this.su_id);
+      this.$parent.$parent.$data.cart_subj = this.$parent.$parent.$data.cart_subj.filter(y => y.su_id != this.su_id);
+
+      if (this.$parent.$parent.$data.inDB_subj_id.some((value) => value == this.su_id)) {
+      this.$parent.$parent.$data.inDB_subj_id = this.$parent.$parent.$data.inDB_subj_id.filter(x => x != this.su_id);
+      this.$parent.$parent.$data.inDB_subj = this.$parent.$parent.$data.inDB_subj.filter(y => y.su_id != this.su_id);
+      this.$parent.$parent.updateDB();
+      }
     },
-    toggleHiding(){
-      if (this.hideValue == false) {
-        this.$parent.hideSubject(this.su_id,this.su_time[this.section]);
-        this.hideValue = true;
-      }
-      else { 
-        this.$parent.addSubject(this.su_id,this.su_time[this.section]); 
-        this.hideValue = false;
-      }
-    }
   },
   mounted(){
     for (var k = 0; k < this.su_sec.length; k++) {
       var singleOption = {text: 'Sec ',value: k};
       singleOption.text = singleOption.text.concat(this.su_sec[k]);
       this.secOptions.push(singleOption)
-    }    
+    }
   }
 }
 </script>
 
 <template>
   <div class="outerBox">
-  <div class="topBox"><div class="toptext"><div class="maintext">{{this.su_id}} {{this.su_name}}</div> <div class="notmain"><span>[{{this.su_genre}}]</span><span> [{{this.su_credit}} credits]</span></div></div></div>  
-  <div>
-  <select class="selectButton" v-model="section" @change="this.timeArr=this.getTimeArray(this.su_time,section),this.changeSection()" > <!-- v-if="this.secOptions.length>1" in case of use don't want drop down-->
-    <option v-for="option in this.secOptions" :key="option.value" :value="option.value">
-      {{ option.text }}
-    </option>
-  </select>
-  </div>
-  <div class='time'><div v-for="item in timeArr" :key="item.date">{{ item.date }}: {{ item.stTime }} - {{ item.enTime }}</div></div>
-  <div class="buttonPack"><button class="miniButton eye" :class="{ eyeSlash: hideValue }" @click="this.toggleHiding()"></button><button class="miniButton trash" @click="this.trashSubjectChild()"></button></div>
-  
-  
+    <div class="topBox"><div class="toptext"><div class="maintext">{{this.su_id}} {{this.su_name}}</div> <div class="notmain"><span>[{{this.su_genre}}]</span><span> [{{this.su_credit}} credits]</span></div></div></div>  
+    <div>
+      <select class="selectButton" v-model="section" @change="this.timeArr=this.getTimeArray(this.su_time,section)"> <!-- v-if="this.secOptions.length>1" in case of use don't want drop down-->
+      <option v-for="option in this.secOptions" :key="option.value" :value="option.value">
+        {{ option.text }}
+      </option>
+    </select>
+    </div>
+    <div class='time'><div v-for="item in timeArr" :key="item.date">{{ item.date }}: {{ item.stTime }} - {{ item.enTime }}</div></div>
+      <div class="buttonPack">
+        <!-- <va-button  icon="add" class="mr-4" @click="this.addSubject()" style="width: 110px; border-radius: 3px;" outline>Add</va-button> -->
+        <va-button  icon="check" class="mr-4" @click="this.removeSubject()" style="width: 110px; border-radius: 3px;" gradient>Added</va-button>
+    </div>
   </div>
 </template>
 
 <style scoped>
 .selectButton{
   padding: 0.208vw;
-  margin-left: 0.521vw; font-size: max(0.833vw, 12px);
+  margin-left: 0.521vw;
 }
 .html {
   scrollbar-color: #888 #f1f1f1;
   scrollbar-width: thin;
 }
 .outerBox{
-  margin-top: 0.260vw;
-  margin-bottom: 0.521vw; /**10 */
+  margin-bottom: 2vh; /**10 */
   border-radius: 0.208vw;
-  border: solid 2px #2c3e50;
+  outline: solid 2px #2c3e50;
   display: flex;/**/
   flex-wrap: wrap;
   justify-content: flex-start;
   /*height: 5.208vw;/*100*/ 
-  width: calc(100% - 5px - 0.4vw);/*400px 900*/
+  /* width: 80%; */
+  width: 40vw;
+  margin: 0px auto; /*previous is 5vw*/
+  margin-bottom: 2vh;
+  /*width: calc(100% - 3px);/*400px 900*/
   font-size: max(0.833vw, 12px);
   row-gap: 0.521vw;
   column-gap: 0.521vw;  
-  padding: 0.2vw;
   background-color: #f1f5f8;
+  padding: 0.521vw;
 }
 .topBox{
   width: 100%;
@@ -189,7 +186,7 @@ export default {
   box-sizing: border-box;
   padding-top: 0.260vw; /*5px*/
   padding-left: 0.260vw;
-  
+  padding-bottom: 0.521vw;
 }
 .maintext{
   font-size: 1.25em;
@@ -204,7 +201,7 @@ export default {
 .time{
   font-size: 1.1em;
   padding-top: 4px;
-  padding-left: 5px; 
+  padding-left: 5px;  
   padding-bottom: 5px;
 }
 .bb{
@@ -212,36 +209,10 @@ export default {
   display: flex; 
   flex-wrap: wrap;
 }
-.miniButton{
-  border: 0px;
-  width: max(1.823vw, 25px);
-  height: max(1.823vw, 25px);
-  background-size: 71% 71%;
-  /*width: 1.823vw;
-  height: 1.823vw;
-  background-size: 1.302vw 1.302vw; /*35->25 40->25 image*/
-  border-radius: 50%;
-  background-repeat: no-repeat;
-  background-position: center;
-  transition: 0.3s;
-  background-color: transparent; /*#f1f5f8*/
-  align-self: flex-end;
-  margin-left: auto;
-}
-.miniButton:hover{
-  background-color: #D3D3D3;
-}
-.trash{
-  background-image: url("../assets/trash-solid.svg");
-}
-.eye{
-  background-image: url("../assets/eye-solid.svg");
-}
-.eyeSlash{
-  background-image: url("../assets/eye-slash-solid.svg");
-}
+
 .buttonPack{
   align-self: flex-end;
   margin-left: auto;
+  
 }
 </style>

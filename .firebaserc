@@ -1,5 +1,9 @@
 {
   "projects": {
-    "default": "training-7ea1b"
-  }
+    "default": "training-7ea1b",
+    "cscuscheduler": "cscuscheduler",
+    "training": "training-7ea1b",
+    "training2": "training2-c9ce3"
+  },
+  "targets": {}
 }

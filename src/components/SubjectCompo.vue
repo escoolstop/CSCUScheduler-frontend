@@ -48,7 +48,7 @@ export default {
           case 4: timeObj.date = 'FRI'; break;
           default: break;
         }
-        switch ((startTime%22)-1) {
+        switch ((startTime-1)%22) {
           case 0: timeObj.stTime = '8:00'; break;
           case 1: timeObj.stTime = '8:30'; break;
           case 2: timeObj.stTime = '9:00'; break;
@@ -73,7 +73,7 @@ export default {
           case 21: timeObj.stTime = '18:30'; break;
           default: break;
         }
-        switch ((endTime%22)-1) {
+        switch ((endTime-1)%22) {
           case 0: timeObj.enTime = '8:30'; break;
           case 1: timeObj.enTime = '9:00'; break;
           case 2: timeObj.enTime = '9:30'; break;
@@ -103,20 +103,26 @@ export default {
       return timeArr;
     },
     addSubject(){
-      this.$parent.$data.cart_subj_id.push(this.su_id)
+      this.$parent.$data.cart_subj_id.push(this.su_id) //this.$parent.$data.cart_subj_id.push(parseInt(this.su_id))
       this.$parent.$data.cart_subj.push({su_id:this.su_id, su_name:this.su_name, su_credit:this.su_credit, su_level:this.su_level,su_genre:this.su_genre,su_time:this.su_time,su_sec:this.su_sec});
+      this.$parent.$data.cart_subj.sort( (a, b) => ( parseInt(a.su_id) > parseInt(b.su_id)) ? 1:-1);
     },
     removeSubject(){
+  
       this.$parent.$data.cart_subj_id = this.$parent.$data.cart_subj_id.filter(x => x != this.su_id);
       this.$parent.$data.cart_subj = this.$parent.$data.cart_subj.filter(y => y.su_id != this.su_id);
+
+      if (this.$parent.$data.inDB_subj_id.some((value) => value == this.su_id)) {
       this.$parent.$data.inDB_subj_id = this.$parent.$data.inDB_subj_id.filter(x => x != this.su_id);
       this.$parent.$data.inDB_subj = this.$parent.$data.inDB_subj.filter(y => y.su_id != this.su_id);
+      this.$parent.updateDB();
+      }
     },
   },
   mounted(){
     for (var k = 0; k < this.su_sec.length; k++) {
-      var singleOption = {text: '',value: k};
-      singleOption.text = this.su_sec[k];
+      var singleOption = {text: 'Sec ',value: k};
+      singleOption.text = singleOption.text.concat(this.su_sec[k]);
       this.secOptions.push(singleOption)
     }
   }
@@ -135,8 +141,8 @@ export default {
     </div>
     <div class='time'><div v-for="item in timeArr" :key="item.date">{{ item.date }}: {{ item.stTime }} - {{ item.enTime }}</div></div>
       <div class="buttonPack">
-        <va-button v-if="!(this.$parent.$data.cart_subj_id.includes(su_id) || this.$parent.$data.inDB_subj_id.includes(su_id))" icon="add" class="mr-4" @click="this.addSubject()">Add</va-button>
-        <va-button v-if="(this.$parent.$data.cart_subj_id.includes(su_id) || this.$parent.$data.inDB_subj_id.includes(su_id))" icon="remove" class="mr-4" @click="this.removeSubject()">Remove</va-button>
+        <va-button v-if="!(this.$parent.$data.cart_subj_id.includes(su_id) || this.$parent.$data.inDB_subj_id.includes(su_id))" icon="add" class="mr-4" @click="this.addSubject()" style="width: 110px; border-radius: 3px;" outline>Add</va-button>
+        <va-button v-if="(this.$parent.$data.cart_subj_id.includes(su_id) || this.$parent.$data.inDB_subj_id.includes(su_id))" icon="check" class="mr-4" @click="this.removeSubject()" style="width: 110px; border-radius: 3px;" gradient>Added</va-button>
     </div>
   </div>
 </template>
@@ -153,19 +159,21 @@ export default {
 .outerBox{
   margin-bottom: 2vh; /**10 */
   border-radius: 0.208vw;
-  outline: solid 1px black;
+  outline: solid 2px #2c3e50;
   display: flex;/**/
   flex-wrap: wrap;
   justify-content: flex-start;
   /*height: 5.208vw;/*100*/ 
   /* width: 80%; */
   width: 40vw;
-  margin: 0px 5vw;
+  margin: 0px auto; /*previous is 5vw*/
   margin-bottom: 2vh;
   /*width: calc(100% - 3px);/*400px 900*/
   font-size: max(0.833vw, 12px);
   row-gap: 0.521vw;
   column-gap: 0.521vw;  
+  background-color: #f1f5f8;
+  padding: 0.521vw;
 }
 .topBox{
   width: 100%;
@@ -178,6 +186,7 @@ export default {
   box-sizing: border-box;
   padding-top: 0.260vw; /*5px*/
   padding-left: 0.260vw;
+  padding-bottom: 0.521vw;
 }
 .maintext{
   font-size: 1.25em;
@@ -191,42 +200,19 @@ export default {
 } */
 .time{
   font-size: 1.1em;
+  padding-top: 4px;
+  padding-left: 5px;  
+  padding-bottom: 5px;
 }
 .bb{
   border: solid 1px black;
   display: flex; 
   flex-wrap: wrap;
 }
-.miniButton{
-  border: 0px;
-  width: max(1.823vw, 25px);
-  height: max(1.823vw, 25px);
-  background-size: 71% 71%;
-  /*width: 1.823vw;
-  height: 1.823vw;
-  background-size: 1.302vw 1.302vw; /*35->25 40->25 image*/
-  border-radius: 50%;
-  background-repeat: no-repeat;
-  background-position: center;
-  transition: 0.3s;
-  background-color: transparent; /*#f1f5f8*/
-  align-self: flex-end;
-  margin-left: auto;
-}
-.miniButton:hover{
-  background-color: #D3D3D3;
-}
-.trash{
-  background-image: url("../assets/trash-solid.svg");
-}
-.eye{
-  background-image: url("../assets/eye-solid.svg");
-}
-.eyeSlash{
-  background-image: url("../assets/eye-slash-solid.svg");
-}
+
 .buttonPack{
   align-self: flex-end;
   margin-left: auto;
+  
 }
 </style>

@@ -1,10 +1,13 @@
 <script>
 import { getAuth, signOut } from 'firebase/auth'
-import { useAuthState } from '../firebase'
+import { useAuthState, getUserState } from '../firebase'
 import { useRouter } from 'vue-router'
 import Test from '../components/TestCompo.vue'
 import { arrnumber } from '../why.js'
+
+
 import axios from 'axios'
+
 import { useSubjectStore } from '../stores/subjectStore'
 //import { initializeApp, applicationDefault, cert } from 'firebase/app'
 
@@ -43,6 +46,8 @@ function hello(){
 export default {
   data() {
     return {
+      adminList : ["coolstopmaplestory@gmail.com"],
+      admin:false,
       displaymode:0,
       how:test,
       how1:test1,
@@ -67,6 +72,7 @@ export default {
       console.log('Document data:', doc.data());
     }*/
     const { user } = useAuthState()
+    console.log(user)
     const auth = getAuth()
     const router = useRouter()
     const signOutUser = async () => {
@@ -80,12 +86,25 @@ export default {
     const subjStore = useSubjectStore()
     return { user, signOutUser, subjStore }
   },
+  beforeCreate(){
+    /* if (getAuth().currentUser.email != 'coolstopmaplestory@gmail.com') { this.admin = true}
+    if (!this.admin) {useRouter().push('/schedule')} */
+  },
   mounted(){
-    hello();
-    document.getElementById("test").innerHTML = "test"+arrnumber()+"/147";
+    if (this.adminList.includes(getAuth().currentUser.email)) { this.admin = true;/*  console.log(this.admin) */}
+    else {useRouter().push('/schedule')}
+    /* hello();
+    document.getElementById("test").innerHTML = "test"+arrnumber()+"/147"; */
     test.push({id: 123456, number: 456789});
     this.timeArray= this.getTimeArray([[51,52,93,94,95,96]],0);
+    /* console.log(getAuth().currentUser.email)
+    console.log(getUserState()) */
+    //if (getAuth().currentUser.email != 'coolstopmaplestory@gmail.com') {useRouter().push('/schedule')}
     
+
+
+
+
     /*axios
       .get('https://api.coindesk.com/v1/bpi/currentprice.json')
       .then(response => (this.info = response))*/
@@ -93,30 +112,67 @@ export default {
       id: '5500112'
     }).then(response => (this.info=(response.data))) */////(this.info.push(response.data.su_time).catch(err => console.log(err))))//(this.info = response.data))*/
 
-  /*   axios.get('https://us-central1-cscuscheduler.cloudfunctions.net/api/subject/querySubject',{
-      params: { id: '2301217' }, headers:{"Access-Control-Allow-Origin":"*"}
+    /* axios.get('https://us-central1-cscuscheduler.cloudfunctions.net/api/subject/querySubject',{
+      params: { id: '2310202' }, headers:{"Access-Control-Allow-Origin":"*"}
     }).then(response => (this.info=(response.data)))  */
     
-    /* axios.get('https://us-central1-cscuscheduler.cloudfunctions.net/api/subject/querySubject',{
+   /*  axios.get('https://us-central1-cscuscheduler.cloudfunctions.net/api/subject/querySubject',{
       params: { id: '3404131' }, headers:{"Access-Control-Allow-Origin":"*"}
     }).then(response => (this.info=(response.data)))  */
 
+
     /* axios.get('https://us-central1-cscuscheduler.cloudfunctions.net/api/credit/queryCredit',{
       params: { id: '1' }, headers:{"Access-Control-Allow-Origin":"*"}
+    }).then(response => (this.info=JSON.parse(response.data.cr_his))) */
+
+    /* axios.get('https://us-central1-cscuscheduler.cloudfunctions.net/api/subject/queryMultSubject',{
+      params: { id: ["2301350","2304103"] }, headers:{"Access-Control-Allow-Origin":"*"}
     }).then(response => (this.info=(response.data))) */
 
-    /* axios.get('https://us-central1-cscuscheduler.cloudfunctions.net/api/subject/MultSubject',{
-      params: { id: "[2301250,2304103]" }, headers:{"Access-Control-Allow-Origin":"*"}
+    /* axios.get('https://us-central1-cscuscheduler.cloudfunctions.net/api/subject/queryMultSubject',{
+      params: { id: ["3404131","2304103","2301217","2310202","0123101","5500112","5500204","5100101","2100111","2104409"] }, headers:{"Access-Control-Allow-Origin":"*"}
     }).then(response => (this.info=(response.data))) */
+
+    axios.get('https://us-central1-cscuscheduler.cloudfunctions.net/api/subject/queryMultSubject',{
+      params: { id: ["3404131","2304103","2301350","2301351","2301361","2301369","2301375","2301468","2301476","2301452","2301476","2303165","5500496"] }, headers:{"Access-Control-Allow-Origin":"*"}
+    }).then(response => (this.info=(response.data)))
     
+    /* axios.put('https://us-central1-cscuscheduler.cloudfunctions.net/api/student/updateSubject',{
+        id: '0987654321' , st_subject: "[]" , headers:{"Access-Control-Allow-Origin":"*"}
+      }).then(response => (console.log(response.data))).catch(error => { console.log(error) }) */
 
     /* axios.put('https://us-central1-cscuscheduler.cloudfunctions.net/api/student/updateSubject',{
-      params: { id: '6133762823', data: '[1234567,7654321]' }, headers:{"Access-Control-Allow-Origin":"*"}
-    }).then(response => (this.info=(response.data))).catch(error => { console.log(error) })   */
+        id: '1234567890', data: '["3404131","2304103","5500112","0000017"]' , headers:{"Access-Control-Allow-Origin":"*"} //"[3404131,2304103,5500112,2301217]"
+    }).then(response => (this.info=(response.data))) //.catch(error => { console.log(error) }) */
 
     /* axios.get('https://us-central1-cscuscheduler.cloudfunctions.net/api/student/queryStudent',{
-      params: { id: '6133762823' }, headers:{"Access-Control-Allow-Origin":"*"}
+      params: { id: '1234567890' }, headers:{"Access-Control-Allow-Origin":"*"}
+    }).then(response => (this.info=JSON.parse(response.data.st_subject))) */
+
+
+
+
+    /* axios.get('https://us-central1-cscuscheduler.cloudfunctions.net/api/student/queryStudentByEmail',{
+      params: { email: 'h@f.com' }, headers:{"Access-Control-Allow-Origin":"*"}
+    }).then(response => (this.info=(response.data.st_subject))) */
+
+
+    /* axios.put('https://us-central1-cscuscheduler.cloudfunctions.net/api/credit/addSubjectToHistory',{
+      id: '6133729123', data:'[3404131,2304103,5500112,2301217]' , headers:{"Access-Control-Allow-Origin":"*"}
     }).then(response => (this.info=(response.data))) */
+
+    /* axios.get('https://us-central1-cscuscheduler.cloudfunctions.net/api/credit/queryCredit',{
+      params: { id: '6133729123' }, headers:{"Access-Control-Allow-Origin":"*"}
+    }).then(response => (this.info=(response.data))) */
+
+
+    /* axios.get('https://us-central1-cscuscheduler.cloudfunctions.net/api/announcement/queryAnnouncement',{
+      headers:{"Access-Control-Allow-Origin":"*"}
+    }).then(response => (this.info=(response.data))) */
+
+    /* axios.put('https://us-central1-cscuscheduler.cloudfunctions.net/api/student/createStudent',{
+       id: 'testID2', name: 'test', email: 'test@test.com' , headers:{"Access-Control-Allow-Origin":"*"}
+    }).then(response => (this.info=(response.data))).catch(error => { console.log(error) }) */  //this return status ok
 
     //console.log(this.info)
   },
@@ -220,10 +276,11 @@ export default {
 </script>
 
 <template>
+  <div v-if="admin"> 
   <div class="container">
     <div class="navt">
       <router-link to="/home" style="text-decoration: none; color: inherit;"><div class="navtbox">Home</div></router-link>
-      <router-link to="/subject" style="text-decoration: none; color: inherit;"><div class="navtbox">Subject</div></router-link>
+      <router-link to="/subject" style="text-decoration: none; color: inherit;"><div class="navtbox">Subject</div></router-link>  
       <router-link to="/schedule" style="text-decoration: none; color: inherit;"><div class="navtbox">Schedule</div></router-link>
       <router-link to="/history" style="text-decoration: none; color: inherit;"><div class="navtbox"><div>Weight</div></div></router-link>
       <div class="navtbox" style="margin-left: auto;">{{ user?.email }}</div>
@@ -274,9 +331,17 @@ export default {
     </div>
   </div>
   API Call Here: {{info}}
+
+  <img class="loadingtest" src = "../assets/loading-spinner.svg" alt="My Happy SVG"/>
+  </div>
 </template>
 
 <style scope>
+.loadingtest{
+  outline: solid 1px black;
+  width: 100px;
+  height: 100px;
+}
 .wraplist{
   background-color: lightblue;
   margin: 0 auto;

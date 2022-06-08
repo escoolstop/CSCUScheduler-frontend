@@ -10,6 +10,7 @@ export default {
     su_id: String, 
     su_name: String, 
     su_time: Array,
+    testArr: Array,
   },
   methods: {
   },
@@ -25,8 +26,8 @@ export default {
 </script>
 
 <template>
-  <div class="outerBox">
-    <div class="left big">{{this.su_id}} {{this.su_name}} </div><div class="left pad">{{this.time}}</div>
+  <div class="outerBox" :class="{dupTime: (((this.testArr.filter(word => JSON.stringify(word.su_time) == JSON.stringify(this.su_time)).length)>1))}"> <!-- (su_time!="TDF"&& -->
+    <div class="left big">{{this.su_id}} {{this.su_name}} </div><div class="left pad">{{this.time}} </div>
   </div>
 </template>
 
@@ -47,20 +48,25 @@ export default {
   width: calc(100% - 30px);
   font-size: max(0.833vw, 12px);
   column-gap: 0.521vw;
-
-  padding: 0.521vw; 
+  background-color: #f1f5f8;
+  padding: 0.8vw 0.521vw; 
 }
 .big{
   font-size: 1.25em;
   width: 100%;
   text-overflow: ellipsis; 
 }
-.left{
+/* .left{
   text-align: left;    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-}
+} */
 .pad{
-  padding-left: 10px;
+  padding-top: 0.521vw;
+  font-size: 1.1em;
+  padding-left: 1.042vw; /*10px or 20 */
+}
+.dupTime{
+  background-color: #ffcc00;
 }
 </style>

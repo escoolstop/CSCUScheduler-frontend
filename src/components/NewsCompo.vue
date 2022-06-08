@@ -30,16 +30,19 @@ export default {
   font-weight: bold;
 }
 .outerBox{
-  border: solid 1px black;
+  /* outline: solid 2px #2c3e50; */
   width: 40vw;/* 500px; */
-  min-width: 700px;
+  min-width: 400px;
   padding: 20px 20px;
   margin: 30px auto;
+  /* margin: 40px auto; */
   text-align: left;
   border-radius: 0.208vw;
   display:flex;
   flex-wrap: wrap;
   row-gap: 20px;
+  background-color: #f1f5f8;
+  box-shadow: 0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12);
 }
 .full{
   width: 100%;

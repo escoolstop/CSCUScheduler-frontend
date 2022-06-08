@@ -1,22 +1,31 @@
 <script>
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth'
 import { useRouter } from 'vue-router'
-
+import axios from 'axios'
+import { getUserState } from '../firebase'
 export default {
   setup() {
+    /* console.log(getUserState()) */
     const auth = getAuth()
     const router = useRouter()
-
+    var createDB = ""
     const handleSubmit = async e => {
-      const { email, password } = e.target.elements
+      const { stID,name,email, password } = e.target.elements
+      /* console.log(stID.value,name.value,email.value,password.value); */
+      if ( (/^\d+$/.test(stID.value)) && stID.value.length == 10 ) {
       try {
         await createUserWithEmailAndPassword(auth, email.value, password.value)
-        router.push('/schedule')
+        axios.put('https://us-central1-cscuscheduler.cloudfunctions.net/api/student/createStudent',{
+        id: stID.value, name: name.value, email: email.value , headers:{"Access-Control-Allow-Origin":"*"}
+        }).then(response => {(createDB=(response.data.status))
+        if (createDB == 'OK') { router.push('/schedule') }        
+        }).catch(error => { getAuth().currentUser.delete(); alert("Your student ID is already used."); console.log(error);})
       } catch (e) {
         alert(e.message)
       }
+      }
+      else { alert("Please input valid student ID.")}
     }
-
     return { handleSubmit }
   }
 }
@@ -27,9 +36,11 @@ export default {
   <div id="absoluteCenteredDiv">
     <form @submit.prevent="handleSubmit">
       <div class="box">
-        <h1>Register</h1>
+        <h1>Register </h1>
+        <input class="fillbox" maxlength="20" name="name" placeholder="First name" type="text" />
+        <input class="fillbox" maxlength="10" name="stID" placeholder="Student ID (10 Digits)" type="text" />
         <input class="fillbox" name="email" placeholder="E-mail" type="email" />
-        <input class="fillbox" name="password" placeholder="Password" type="password" />
+        <input class="fillbox" name="password" placeholder="Password (at least 6 char)" type="password" />
         <a href="#"><button class="button" type="submit">Sign Up</button></a>
       </div>
     </form>

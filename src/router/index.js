@@ -1,12 +1,20 @@
 import { createRouter, createWebHistory } from 'vue-router'
+
 import { getUserState } from '../firebase'
+import { getAuth } from 'firebase/auth'
 
 const routes = [
+  {
+    path: '/admin',
+    name: 'Admin',
+    component: () => import('../views/AdminPage.vue'),
+    meta: { requiresAuth: true, title: 'Admin | CSCUScheduler'}
+  },
   {
     path: '/test',
     name: 'Test',
     component: () => import('../views/TestdB.vue'),
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true, title: 'Test | CSCUScheduler'}
   },
   {
     path: '/',
@@ -61,7 +69,7 @@ router.beforeEach(async (to, from, next) => {
 
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
   const requiresUnauth = to.matched.some(record => record.meta.requiresUnauth)
-
+  //const admin = await getAuth().currentUser.email
   const isAuth = await getUserState()
 
   if (requiresAuth && !isAuth) next('/login')

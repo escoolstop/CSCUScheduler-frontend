@@ -2,14 +2,17 @@
 import { getAuth, signOut } from 'firebase/auth'
 import { useAuthState } from '../firebase'
 import { useRouter } from 'vue-router'
-import { axios } from 'axios'
+import axios from 'axios'
 
 export default {
   name: 'HistoryPage',
   data(){
     return{
+      loadstate:true,
+      subject: {},// this is temp subject for input
       displaymode:1,
-      subjAll:[{su_id:'2301111', su_name: 'CALCULUS I', su_credit:3, su_level:'4',su_genre:'CS1'},{su_id:2301151, su_name: 'CALCULUS I', su_credit:3, su_level:'4',su_genre:'CS1'}
+      subjAll_ID:[],
+      /* subjAll:[{su_id:'2301111', su_name: 'CALCULUS I', su_credit:3, su_level:'4',su_genre:'CS1'},{su_id:2301151, su_name: 'CALCULUS I', su_credit:"3", su_level:'4',su_genre:'CS1'}
       ,{su_id:'2301222', su_name: 'CALCULUS I', su_credit:3, su_genre:'CS-CORE'}, {su_id:'2312100', su_name: 'MICROB', su_credit:3, su_genre:'GEN-SC'}
       ,{su_id:'3404117', su_name: 'INTRO TO LAW', su_credit:3, su_genre:'GEN-SO'}
       ,{su_id:'2301361', su_name: 'SYSTEMS ANALYSIS AND DESIGN', su_credit:3, su_genre:'CS1'},{su_id:'2301361', su_name: 'SYSTEMS ANALYSIS AND DESIGN', su_credit:3, su_genre:'CS1'}
@@ -22,16 +25,28 @@ export default {
       subj4_1:[{su_id:'3404117', su_name: 'INTRO TO LAW', su_credit:3, su_genre:'GEN-SO'}],
       subj4_2:[{su_id:'2296352', su_name: '21ST CENTURY BUDDHISTS', su_credit:3, su_genre:'GEN-HU'}],
       subj4_3:[{su_id:'3309102', su_name: 'OUR BODY', su_credit:3, su_genre:'GEN-SC'}], 
-      subj4_4:[{su_id:'0201122', su_name: 'MANAGEMENT OF PUBLIC DISASTER', su_credit:3, su_genre:'GEN-IN'}],/*
+      subj4_4:[{su_id:'0201122', su_name: 'MANAGEMENT OF PUBLIC DISASTER', su_credit:3, su_genre:'GEN-IN'}],
+      subj4_5:[{su_id:'5500112', su_name: 'EXPERIENTIAL ENGLISH II', su_credit:3, su_genre:'GEN-LANG'}],
+      subj4_6:[{su_id:'2312101', su_name: 'MICROB II', su_credit:3, su_genre:'GEN-SC'}],
+      subj5:[], */
+      subjAll_temp:[],
+      subjAll:[],
+      subj1_1:[],
+      subj1_2:[],
+      subj2_1:[],
+      subj2_2:[],
+      subj3:[],
       subj4_1:[],
       subj4_2:[],
       subj4_3:[], 
-      subj4_4:[],*/
-      subj4_5:[{su_id:'5500112', su_name: 'EXPERIENTIAL ENGLISH II', su_credit:3, su_genre:'GEN-LANG'}],
-      subj4_6:[{su_id:'2312100', su_name: 'MICROB', su_credit:3, su_genre:'GEN-SC'}],
+      subj4_4:[],
+      subj4_5:[],
+      subj4_6:[],
       subj5:[],
       info:"test",
       subjectNumberInput:'',
+      cr_id:'',
+      student_ID:'',
     }
   },
   setup() {
@@ -105,43 +120,113 @@ export default {
             i--;
             length--;
         }
-    } return;
+      } return;
     },
-    addSubject(){
-      if (this.subjectNumberInput.length == 0) { this.$vaToast.init({message: 'Please insert 7 digits input', position: 'bottom-left', color: 'warning'}); return; }
-      if ((!isNaN(this.subjectNumberInput)) && (this.subjectNumberInput.length == 7) && true) { // true = check if subject exist in database hellhole
-        console.log("Add "+this.subjectNumberInput);
-        this.subjectNumberInput="";
-        return; // add subject to array and process it - maybe no if i'm too lazy
-      }
-      this.$vaToast.init({message: 'Invalid Input/Subject is not exist', position: 'bottom-left', color: 'warning'});
+    async addSubject(){
+      if ( !(this.subjectNumberInput.length == 7) || !(/^\d+$/.test(this.subjectNumberInput))) { this.$vaToast.init({message: 'Please insert 7 digits input', position: 'bottom-left', color: 'warning'}); return; }
+      await axios.get('https://us-central1-cscuscheduler.cloudfunctions.net/api/subject/querySubject',{
+      params: { id: this.subjectNumberInput }, headers:{"Access-Control-Allow-Origin":"*"}
+      }).then(response =>{ ( this.subject=(response.data[0])) 
+          if (this.subject != "No matching documents."){
+            /* console.log(this.subject) */
+            this.subject.su_credit = parseInt(this.subject.su_credit)
+            this.subjAll_ID.push(this.subject.su_id)
+            this.subjAll = [this.subject];
+            this.sortSubjAll();
+            this.subjectNumberInput="";
+            this.$vaToast.init({message: 'Subject '+this.subject.su_id+' Added', position: 'bottom-left', color: 'warning'});
+            axios.put('https://us-central1-cscuscheduler.cloudfunctions.net/api/credit/addSubjectToHistory',{
+            id: this.student_ID, data: JSON.stringify(this.subjAll_ID) , headers:{"Access-Control-Allow-Origin":"*"}
+            }).then(response => (this.info=(response.data)))
+          }
+          else { this.$vaToast.init({message: 'This subject does not exist.', position: 'bottom-left', color: 'warning'}); }
+      }).catch(error => { console.log(error) })
     },
     removeSubject(){
-      if (this.subjectNumberInput.length == 0) { this.$vaToast.init({message: 'Please insert 7 digits input', position: 'bottom-left', color: 'warning'}); return; }
-      if ((!isNaN(this.subjectNumberInput)) && (this.subjectNumberInput.length == 7) && true) { // true = check if subject exist in student array hellhole
-        console.log("Remove "+this.subjectNumberInput);
-        this.subjectNumberInput="";
-        return; // remove subject checking all array then delete subject in student array
+      if (!(this.subjectNumberInput.length == 7) || !(/^\d+$/.test(this.subjectNumberInput))) { this.$vaToast.init({message: 'Please insert 7 digits input', position: 'bottom-left', color: 'warning'}); return; }
+      var removedSubject = ((value) => value.su_id == this.subjectNumberInput);
+      if (this.subj5.some(removedSubject)) { this.subj5 = this.subj5.filter((element) => element.su_id != this.subjectNumberInput); this.removefromDB(); this.subjectNumberInput=""; return;}
+      if (this.subj4_1.some(removedSubject)) { this.subj4_1 = this.subj4_1.filter((element) => element.su_id != this.subjectNumberInput); this.removefromDB(); this.subjectNumberInput=""; return;}
+      if (this.subj4_2.some(removedSubject)) { this.subj4_2 = this.subj4_2.filter((element) => element.su_id != this.subjectNumberInput); this.removefromDB(); this.subjectNumberInput=""; return;}
+      if (this.subj4_3.some(removedSubject)) { this.subj4_3 = this.subj4_3.filter((element) => element.su_id != this.subjectNumberInput); this.removefromDB(); this.subjectNumberInput=""; return;}
+      if (this.subj4_4.some(removedSubject)) { this.subj4_4 = this.subj4_4.filter((element) => element.su_id != this.subjectNumberInput); this.removefromDB(); this.subjectNumberInput=""; return;}
+      if (this.subj4_5.some(removedSubject)) { this.subj4_5 = this.subj4_5.filter((element) => element.su_id != this.subjectNumberInput); this.removefromDB(); this.subjectNumberInput=""; return;}
+      if (this.subj4_6.some(removedSubject)) { this.subj4_6 = this.subj4_6.filter((element) => element.su_id != this.subjectNumberInput); this.removefromDB(); this.subjectNumberInput=""; return;}
+      if (this.subj3.some(removedSubject)) { this.subj3 = this.subj3.filter((element) => element.su_id != this.subjectNumberInput); this.removefromDB(); this.subjectNumberInput=""; return;}
+      if (this.subj2_1.some(removedSubject)) { this.subj2_1 = this.subj2_1.filter((element) => element.su_id != this.subjectNumberInput); this.removefromDB(); this.subjectNumberInput=""; return;}  
+      if (this.subj2_2.some(removedSubject)) { this.subj2_2 = this.subj2_2.filter((element) => element.su_id != this.subjectNumberInput); this.removefromDB(); this.subjectNumberInput=""; return;}
+      if (this.subj1_1.some(removedSubject)) { this.subj1_1 = this.subj1_1.filter((element) => element.su_id != this.subjectNumberInput); this.removefromDB(); this.subjectNumberInput=""; return;}
+      if (this.subj1_2.some(removedSubject)) { this.subj1_2 = this.subj1_2.filter((element) => element.su_id != this.subjectNumberInput); this.removefromDB(); this.subjectNumberInput=""; return;}
+      this.$vaToast.init({message: 'This subject does not exist', position: 'bottom-left', color: 'warning'})
+      this.subjectNumberInput="";
+      return; 
+    },
+    async removefromDB(){
+      this.subjAll_ID = this.subjAll_ID.filter((subid) => subid != this.subjectNumberInput);
+      await axios.put('https://us-central1-cscuscheduler.cloudfunctions.net/api/credit/addSubjectToHistory',{
+      id: this.student_ID, data: JSON.stringify(this.subjAll_ID) , headers:{"Access-Control-Allow-Origin":"*"}
+      }).then(response => (this.info=(response.data)))
+    },
+    sortSubjAll(){
+      this.sortSubjByGenre(this.subjAll, this.subj2_1, 'CS-CORE', 43)
+      this.sortSubjByGenre(this.subjAll, this.subj3, 'SC-CORE', 31)
+      this.sortSubjById(this.subjAll, this.subj2_2, ['2301361','2301367','2301369'], 6)
+      this.sortSubjById(this.subjAll, this.subj4_5, ['5500111','5500112','5500204','5500496'], 12)
+      this.sortSubjById(this.subjAll, this.subj4_6, ['2301170'], 3)
+      this.sortSubjByGenre(this.subjAll, this.subj1_1, 'CS1', 15)
+      this.sortSubjByGenre(this.subjAll, this.subj1_2, 'CS2', 6)
+      this.sortSubjByGenre(this.subjAll, this.subj1_2, 'CS1', 6)
+      this.sortSubjByGenre_ReverseRegexpy(this.subjAll, this.subj4_1, 'GEN-SO', 3, '^23')
+      this.sortSubjByGenre_ReverseRegexpy(this.subjAll, this.subj4_2, 'GEN-HU', 3, '^23')
+      this.sortSubjByGenre_ReverseRegexpy(this.subjAll, this.subj4_3, 'GEN-SC', 3, '^23')
+      this.sortSubjByGenre_ReverseRegexpy(this.subjAll, this.subj4_4, 'GEN-IN', 3, '^23')
+      this.sortSubjByGenre(this.subjAll, this.subj4_5, 'GEN-LANG', 12)
+      this.sortSubjByGenre_Regexpy(this.subjAll, this.subj4_6, 'GEN-SC', 6, '^23')
+      this.subj5.push(...this.subjAll)
+      this.subjAll = [];
+    },
+    creditToInt(){
+      for (var i = 0, length = this.subjAll.length; i < length; i++) {
+        this.subjAll/* _temp */[i].su_credit = parseInt(this.subjAll/* _temp */[i].su_credit);
       }
-      this.$vaToast.init({message: 'Invalid Input/Subject is not exist', position: 'bottom-left', color: 'warning'});
-    }
+    },
   },
-  created(){
-    this.sortSubjByGenre(this.subjAll, this.subj2_1, 'CS-CORE', 43)
-    this.sortSubjByGenre(this.subjAll, this.subj3, 'SC-CORE', 31)
-    this.sortSubjById(this.subjAll, this.subj2_2, ['2301361','2301367','2301369'], 6)
-    this.sortSubjById(this.subjAll, this.subj4_5, ['5500111','5500112','5500204','5500496'], 12)
-    this.sortSubjById(this.subjAll, this.subj4_6, ['2301170'], 3) /*only take comp prog real max is 6*/
-    this.sortSubjByGenre(this.subjAll, this.subj1_1, 'CS1', 15)
-    this.sortSubjByGenre(this.subjAll, this.subj1_2, 'CS2', 6)
-    this.sortSubjByGenre(this.subjAll, this.subj1_2, 'CS1', 6)
-    this.sortSubjByGenre_ReverseRegexpy(this.subjAll, this.subj4_1, 'GEN-SO', 3, '^23')
-    this.sortSubjByGenre_ReverseRegexpy(this.subjAll, this.subj4_2, 'GEN-HU', 3, '^23')
-    this.sortSubjByGenre_ReverseRegexpy(this.subjAll, this.subj4_3, 'GEN-SC', 3, '^23')
-    this.sortSubjByGenre_ReverseRegexpy(this.subjAll, this.subj4_4, 'GEN-LANG', 3, '^23')
-    this.sortSubjByGenre_Regexpy(this.subjAll, this.subj4_6, 'GEN-SC', 6, '^23')
-    this.subj5 = [...this.subjAll]
+  async mounted(){
+    await axios.get('https://us-central1-cscuscheduler.cloudfunctions.net/api/student/queryStudentByEmail',{
+      params: { email: getAuth().currentUser.email }, headers:{"Access-Control-Allow-Origin":"*"}
+    }).then(response => {(this.cr_id=(response.data.cr_id)); this.student_ID = response.data.cr_id;})
+    
+    await axios.get('https://us-central1-cscuscheduler.cloudfunctions.net/api/credit/queryCredit',{
+      params: { id: this.cr_id }, headers:{"Access-Control-Allow-Origin":"*"}
+    }).then(response => {
+      if (response.data.cr_his == "") { this.subjAll_ID=[]; }
+      else { this.subjAll_ID=JSON.parse(response.data.cr_his); }
+      
+    })
+    /* console.log(this.subjAll_ID) */
+    console.log(this.subjAll_ID)
+    if (!this.subjAll_ID.length == 0) {
+    /* console.log("active") */
+      
+         
+    await axios.get('https://us-central1-cscuscheduler.cloudfunctions.net/api/subject/queryMultSubject',{
+      params: { id: this.subjAll_ID }, headers:{"Access-Control-Allow-Origin":"*"}
+    }).then(response => {(this.subjAll=(response.data))
+      /* console.log(response.data) */
+      if (this.subjAll[0] instanceof Array){
+            var tempsubjarray = []
+            for (var i = 0, length = this.subjAll.length; i < length; i++) {
+              for (var j = 0, innerlength = this.subjAll[i].length; j < innerlength; j++){tempsubjarray.push(this.subjAll[i][j])}
+            }
+            this.subjAll = tempsubjarray;
+      }
+      this.creditToInt();
+    })
+    }
+    this.sortSubjAll();
+    this.loadstate=false
   }
+  
 }
 </script>
 
@@ -151,11 +236,12 @@ export default {
     <router-link to="/home" style="text-decoration: none; color: inherit;"><div class="navbox">Home</div></router-link>
     <router-link to="/subject" style="text-decoration: none; color: inherit;"><div class="navbox">Subject</div></router-link>
     <router-link to="/schedule" style="text-decoration: none; color: inherit;"><div class="navbox">Schedule</div></router-link>
-    <router-link to="/history" style="text-decoration: none; color: inherit;"><div class="navbox">History</div></router-link>
+    <router-link to="/history" style="text-decoration: none; color: inherit;"><div class="navboxactive">History</div></router-link>
     <div class="navbox" style="margin-left: auto;">{{ user?.email }}</div>
     <div class="navbox" @click="signOutUser">Sign Out</div>
   </div>
-  <div class="center">
+  <img class="loading" v-if="loadstate" src = "../assets/loading-spinner.svg" alt="My Happy SVG"/>
+  <div class="center" v-if="!loadstate">
     <div class="wrappermain">
       <div class="wrapperLeftBox">
       <div class="selectorBox">
@@ -206,22 +292,22 @@ export default {
       
       <div v-if="displaymode==4" class="subjectDisplayBox">
 
-      <div class="subjectHead">กลุ่มวิชาสังคมศาสตร์ {{ totalRequest(subj4_1) }}/3</div>
+      <div class="subjectHead">GEN-SO (กลุ่มวิชาสังคมศาสตร์) {{ totalRequest(subj4_1) }}/3</div>
       <div v-for="item in subj4_1" :key="item.su_id" class=subjectList>{{ item.su_genre }}: {{ item.su_id }} | {{ item.su_name }} | {{ item.su_credit }}</div>
 
-      <div class="subjectHead">กลุ่มวิชามนุษยศาสตร์ {{ totalRequest(subj4_2) }}/3</div>
+      <div class="subjectHead">GEN-HU (กลุ่มวิชามนุษยศาสตร์) {{ totalRequest(subj4_2) }}/3</div>
       <div v-for="item in subj4_2" :key="item.su_id" class=subjectList>{{ item.su_genre }}: {{ item.su_id }} | {{ item.su_name }} | {{ item.su_credit }}</div>
 
-      <div class="subjectHead">วิทยาศาสตร์และคณิตศาสตร {{ totalRequest(subj4_3) }}/3</div>
+      <div class="subjectHead">GEN-SC (กลุ่มวิชาวิทยาศาสตร์และคณิตศาสตร์) {{ totalRequest(subj4_3) }}/3</div>
       <div v-for="item in subj4_3" :key="item.su_id" class=subjectList>{{ item.su_genre }}: {{ item.su_id }} | {{ item.su_name }} | {{ item.su_credit }}</div>
 
-      <div class="subjectHead">กลุ่มวิชาสหศาสตร์ {{ totalRequest(subj4_4) }}/3</div>
+      <div class="subjectHead">GEN-IN (กลุ่มวิชาสหศาสตร์) {{ totalRequest(subj4_4) }}/3</div>
       <div v-for="item in subj4_4" :key="item.su_id" class=subjectList>{{ item.su_genre }}: {{ item.su_id }} | {{ item.su_name }} | {{ item.su_credit }}</div>
 
-      <div class="subjectHead">กลุ่มวิชาภาษา {{ totalRequest(subj4_5) }}/12</div>
+      <div class="subjectHead">GEN-LANG (กลุ่มวิชาภาษา) {{ totalRequest(subj4_5) }}/12</div>
       <div v-for="item in subj4_5" :key="item.su_id" class=subjectList>{{ item.su_genre }}: {{ item.su_id }} | {{ item.su_name }} | {{ item.su_credit }}</div>
 
-      <div class="subjectHead">กลุ่มวิชาศึกษาทั่วไปกลุ่มพิเศษ {{ totalRequest(subj4_6) }}/6</div>
+      <div class="subjectHead">GEN-SP (กลุ่มวิชาศึกษาทั่วไปกลุ่มพิเศษ) {{ totalRequest(subj4_6) }}/6</div>
       <div v-for="item in subj4_6" :key="item.su_id" class=subjectList>{{ item.su_genre }}: {{ item.su_id }} | {{ item.su_name }} | {{ item.su_credit }}</div>
         
           
@@ -256,12 +342,12 @@ export default {
           <div v-if="totalRequest(subj4_1)>=3&&totalRequest(subj4_2)>=3&&totalRequest(subj4_3)>=3&&totalRequest(subj4_4)>=3&&totalRequest(subj4_5)>=12&&totalRequest(subj4_6)>=6" class="summGreen"><img src="../assets/circle-check-regular.svg" class="checkImg"/><div>ALL CLEAR</div></div>
           <div v-else class="summRed">
             <img src="../assets/circle-xmark-regular.svg" class="checkImg"/>
-            <div v-if="totalRequest(subj4_1)<3">กลุ่มวิชาสังคมศาสตร์ - {{3 - totalRequest(subj4_1)}} CR</div>
-            <div v-if="totalRequest(subj4_2)<3">กลุ่มวิชามนุษยศาสตร์ - {{3 - totalRequest(subj4_2)}} CR</div>
-            <div v-if="totalRequest(subj4_3)<3">กลุ่มวิชามนุษยศาสตร์ - {{3 - totalRequest(subj4_3)}} CR</div>
-            <div v-if="totalRequest(subj4_4)<3">กลุ่มวิชาสหศาสตร์ - {{3 - totalRequest(subj4_4)}} CR</div>
-            <div v-if="totalRequest(subj4_5)<12">กลุ่มวิชาภาษา - {{12 - totalRequest(subj4_5)}} CR</div>
-            <div v-if="totalRequest(subj4_6)<6">กลุ่มวิชาศึกษาทั่วไปกลุ่มพิเศษ - {{6 - totalRequest(subj4_6)}} CR</div>
+            <div v-if="totalRequest(subj4_1)<3">GEN-SO - {{3 - totalRequest(subj4_1)}} CR</div>
+            <div v-if="totalRequest(subj4_2)<3">GEN-HU - {{3 - totalRequest(subj4_2)}} CR</div>
+            <div v-if="totalRequest(subj4_3)<3">GEN-SC - {{3 - totalRequest(subj4_3)}} CR</div>
+            <div v-if="totalRequest(subj4_4)<3">GEN-IN - {{3 - totalRequest(subj4_4)}} CR</div>
+            <div v-if="totalRequest(subj4_5)<12">GEN-LANG - {{12 - totalRequest(subj4_5)}} CR</div>
+            <div v-if="totalRequest(subj4_6)<6">GEN-SP - {{6 - totalRequest(subj4_6)}} CR</div>
           </div>
         </div>
         <div v-if="displaymode==5">
@@ -275,8 +361,16 @@ export default {
 </template>
 
 <style scoped>
-
 /*dev viewport width = 1920*/
+.loading{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  margin-top: -50px;
+  margin-left: -50px;
+  width: 100px;
+  height: 100px;
+}
 .center{
   margin: 0 0;
   align-content: center;
@@ -319,7 +413,7 @@ export default {
   justify-content: center; /* align horizontal */  
   align-items: center; /* align vertical */  
   align-content: flex-start;
-  outline: solid #5e6f81 1px;
+  /* outline: solid #5e6f81 1px; */
 }
 .circle{
   background-color: lightblue;

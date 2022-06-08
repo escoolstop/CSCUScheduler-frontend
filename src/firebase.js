@@ -4,17 +4,24 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { initializeApp } from 'firebase/app'
 
 export const firebaseApp = initializeApp({
-  apiKey: "AIzaSyDEhrluB2j5pxXdM5WC14_DwAwWe1BThuM",
 
-  authDomain: "training2-c9ce3.firebaseapp.com",
+  apiKey: "AIzaSyDHjAy4jTZMMw9Emg0qn25jbl9mRiOi27U",
 
-  projectId: "training2-c9ce3",
+  authDomain: "cscuscheduler.firebaseapp.com",
 
-  storageBucket: "training2-c9ce3.appspot.com",
+  databaseURL: "https://cscuscheduler-default-rtdb.asia-southeast1.firebasedatabase.app",
 
-  messagingSenderId: "143310875267",
+  projectId: "cscuscheduler",
 
-  appId: "1:143310875267:web:19e7c3c5aed616a08809b6"
+  storageBucket: "cscuscheduler.appspot.com",
+
+  messagingSenderId: "708856691398",
+
+  appId: "1:708856691398:web:017c94a3bb0ef5bab835c7",
+
+  measurementId: "G-7MNMJ7G0NT"
+
+
 })
 
 export const getUserState = () =>
